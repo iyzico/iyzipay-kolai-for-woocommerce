@@ -1,0 +1,19 @@
+/**
+ * The admin-specific stylesheet for the plugin
+ *
+ * @package    Kolai
+ * @subpackage Kolai/admin/css
+ */
+
+/* Kolai Admin Styles */
+.kolai-settings-page {
+    max-width: 1200px;
+}
+
+.kolai-settings-page .form-table th {
+    width: 200px;
+}
+
+.kolai-settings-page .regular-text {
+    width: 400px;
+}
