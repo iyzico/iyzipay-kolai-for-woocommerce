@@ -27,7 +27,7 @@ class Kolai_Address {
 
         $country = sanitize_text_field($address['countryId']);
         $state = sanitize_text_field($address['cityId']);
-        $city = sanitize_text_field($address['districtId']);
+        $city = isset($address['districtId']) ? sanitize_text_field($address['districtId']) : '';
 
         // WooCommerce TR state codes are usually like TR34. Normalize if numeric.
         if ($country === 'TR' && preg_match('/^\d+$/', $state)) {
@@ -115,8 +115,8 @@ class Kolai_Address {
             throw new Kolai_Invalid_Address_Exception('Address is required');
         }
 
-        if (empty($address['countryId']) || empty($address['cityId']) || empty($address['districtId'])) {
-            throw new Kolai_Invalid_Address_Exception('countryId, cityId and districtId are required');
+        if (empty($address['countryId']) || empty($address['cityId'])) {
+            throw new Kolai_Invalid_Address_Exception('countryId and cityId are required');
         }
     }
 }
