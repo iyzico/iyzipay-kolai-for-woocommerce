@@ -37,19 +37,19 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
         register_rest_route('kolai/v1', '/orders', array(
             'methods' => 'POST',
             'callback' => array($this, 'create_order'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_CREATE_ORDER),
         ));
 
         register_rest_route('kolai/v1', '/order-types', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_order_types'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_ORDER_TYPES),
         ));
 
         register_rest_route('kolai/v1', '/orders/(?P<orderId>\d+)', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_order'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_ORDER),
             'args' => array(
                 'orderId' => array(
                     'required' => true,
@@ -63,7 +63,7 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
         register_rest_route('kolai/v1', '/orders/(?P<orderId>\d+)', array(
             'methods' => 'PATCH',
             'callback' => array($this, 'update_order'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_UPDATE_ORDER_STATUS),
             'args' => array(
                 'orderId' => array(
                     'required' => true,

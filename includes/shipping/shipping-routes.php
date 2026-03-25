@@ -37,7 +37,7 @@ class Kolai_Shipping_Routes extends Kolai_Route_Base {
         register_rest_route('kolai/v1', '/shipment-options', array(
             'methods' => 'POST',
             'callback' => array($this, 'get_shipment_options'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_SHIPMENT_OPTIONS),
         ));
     }
 

@@ -85,6 +85,15 @@ class Kolai_Service_Unavailable_Exception extends Kolai_Exception {
 }
 
 /**
+ * 401 Unauthorized exception.
+ */
+class Kolai_Unauthorized_Exception extends Kolai_Exception {
+    public function __construct($message = 'Unauthorized', $error_code = Kolai_Constants::ERROR_UNAUTHORIZED) {
+        parent::__construct($message, $error_code, 401);
+    }
+}
+
+/**
  * Product not found exception.
  */
 class Kolai_Product_Not_Found_Exception extends Kolai_Not_Found_Exception {
@@ -188,6 +197,33 @@ class Kolai_Insufficient_Stock_Exception extends Kolai_Conflict_Exception {
  */
 class Kolai_Discount_Exceeds_Total_Exception extends Kolai_Bad_Request_Exception {
     public function __construct($message = 'Discount exceeds order total', $error_code = Kolai_Constants::ERROR_DISCOUNT_EXCEEDS_TOTAL) {
+        parent::__construct($message, $error_code);
+    }
+}
+
+/**
+ * Invalid contract type exception.
+ */
+class Kolai_Invalid_Contract_Type_Exception extends Kolai_Bad_Request_Exception {
+    public function __construct($message = 'Invalid contract type', $error_code = Kolai_Constants::ERROR_INVALID_CONTRACT_TYPE) {
+        parent::__construct($message, $error_code);
+    }
+}
+
+/**
+ * Invalid contract request exception.
+ */
+class Kolai_Invalid_Contract_Request_Exception extends Kolai_Bad_Request_Exception {
+    public function __construct($message = 'Invalid contract request', $error_code = Kolai_Constants::ERROR_INVALID_CONTRACT_REQUEST) {
+        parent::__construct($message, $error_code);
+    }
+}
+
+/**
+ * Contract not found exception.
+ */
+class Kolai_Contract_Not_Found_Exception extends Kolai_Not_Found_Exception {
+    public function __construct($message = 'Contract not found', $error_code = Kolai_Constants::ERROR_CONTRACT_NOT_FOUND) {
         parent::__construct($message, $error_code);
     }
 }

@@ -46,14 +46,14 @@ class Kolai_Product_Routes extends Kolai_Route_Base {
         register_rest_route('kolai/v1', '/products', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_products'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_PRODUCTS),
         ));
         
         // Get single product by ID
         register_rest_route('kolai/v1', '/products/(?P<id>\d+)', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_product'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_PRODUCT),
             'args' => array(
                 'id' => array(
                     'required' => true,
@@ -68,7 +68,7 @@ class Kolai_Product_Routes extends Kolai_Route_Base {
         register_rest_route('kolai/v1', '/products-with-variants/(?P<id>\d+)', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_product_with_variants'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_PRODUCT_WITH_VARIANTS),
             'args' => array(
                 'id' => array(
                     'required' => true,

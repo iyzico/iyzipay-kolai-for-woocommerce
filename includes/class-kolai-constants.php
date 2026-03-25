@@ -26,6 +26,7 @@ class Kolai_Constants {
     const ERROR_NOT_FOUND = '1002';
     const ERROR_SERVICE_UNAVAILABLE = '1003';
     const ERROR_WOOCOMMERCE_INACTIVE = '1004';
+    const ERROR_UNAUTHORIZED = '1005';
 
     // 2xxx: Product errors
     const ERROR_INVALID_PRODUCT_ID = '2000';
@@ -43,4 +44,9 @@ class Kolai_Constants {
     const ERROR_INVALID_SHIPMENT_OPTION = '4001';
     const ERROR_INSUFFICIENT_STOCK = '4002';
     const ERROR_DISCOUNT_EXCEEDS_TOTAL = '4003';
+
+    // 5xxx: Contract errors
+    const ERROR_INVALID_CONTRACT_TYPE    = '5000';
+    const ERROR_INVALID_CONTRACT_REQUEST = '5001';
+    const ERROR_CONTRACT_NOT_FOUND       = '5002';
 }

@@ -80,6 +80,15 @@ class Kolai_Admin {
             'dashicons-admin-generic',
             30
         );
+
+        add_submenu_page(
+            'kolai-settings',
+            __('Sozlesmeler', 'kolai'),
+            __('Sozlesmeler', 'kolai'),
+            'manage_options',
+            'kolai-contracts',
+            array($this, 'display_contracts_page')
+        );
     }
     
     /**
@@ -87,5 +96,12 @@ class Kolai_Admin {
      */
     public function display_settings_page() {
         include_once KOLAI_ADMIN_DIR . 'views/settings-page.php';
+    }
+
+    /**
+     * Render the contracts page
+     */
+    public function display_contracts_page() {
+        include_once KOLAI_ADMIN_DIR . 'views/contracts-page.php';
     }
 }

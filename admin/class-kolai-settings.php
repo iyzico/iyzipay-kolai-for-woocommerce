@@ -94,6 +94,47 @@ class Kolai_Settings {
             'kolai_api_section',
             array('label_for' => 'kolai_secret_key')
         );
+
+        // Contract settings
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_contract_distance_sales',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'wp_kses_post',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_contract_preliminary_info',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'wp_kses_post',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_seller_tax_id',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_seller_mersis_no',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
     }
     
     /**
