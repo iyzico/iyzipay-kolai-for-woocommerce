@@ -35,8 +35,8 @@ class Kolai_Contract_Service {
      */
     public function get_placeholder_definitions() {
         return array(
-            '{{seller_name}}'                => 'Satici adi (site adi)',
-            '{{seller_address}}'             => 'Satici adresi (WooCommerce magaza adresi)',
+            '{{seller_name}}'                => 'Satici adi',
+            '{{seller_address}}'             => 'Satici adresi',
             '{{seller_phone}}'               => 'Satici telefonu',
             '{{seller_email}}'               => 'Satici e-posta adresi',
             '{{seller_tax_id}}'              => 'Satici VKN',
@@ -59,10 +59,10 @@ class Kolai_Contract_Service {
     }
 
     /**
-     * Get contract: template with seller placeholders filled, rest left as-is.
+     * Get contract template with all placeholders preserved for the client.
      *
      * @param string $type Contract type key.
-     * @return array  'content' (HTML with seller filled), 'placeholders' (remaining keys to fill)
+     * @return array
      * @throws Kolai_Invalid_Contract_Type_Exception
      * @throws Kolai_Contract_Not_Found_Exception
      */
@@ -73,39 +73,61 @@ class Kolai_Contract_Service {
             throw new Kolai_Contract_Not_Found_Exception("Contract template not found for type: {$type}");
         }
 
-        // Only replace seller placeholders — the rest stays as {{placeholder}} for the client
-        $seller = $this->build_seller_params();
-        $seller_replacements = array(
-            '{{seller_name}}'      => $seller['name'],
-            '{{seller_address}}'   => $seller['address'],
-            '{{seller_phone}}'     => $seller['phone'],
-            '{{seller_email}}'     => $seller['email'],
-            '{{seller_tax_id}}'    => $seller['tax_id'],
-            '{{seller_mersis_no}}' => $seller['mersis_no'],
+        return array(
+            'content'      => $template,
+            'placeholders' => $this->get_placeholders_for_content($template),
         );
+    }
 
-        $content = str_replace(
-            array_keys($seller_replacements),
-            array_values($seller_replacements),
-            $template
-        );
+    /**
+     * Get all contract templates keyed by contract type.
+     *
+     * @return array
+     * @throws Kolai_Contract_Not_Found_Exception
+     * @throws Kolai_Invalid_Contract_Type_Exception
+     */
+    public function get_contracts() {
+        $contracts = array();
 
-        // Collect remaining placeholders that the client needs to fill
-        $remaining = array();
-        $all_placeholders = $this->get_placeholder_definitions();
-        foreach ($all_placeholders as $key => $description) {
-            // Skip seller ones — already replaced
-            if (isset($seller_replacements[$key])) {
-                continue;
-            }
-            if (strpos($content, $key) !== false) {
-                $remaining[$key] = $description;
-            }
+        foreach ($this->get_available_types() as $type => $title) {
+            $contract = $this->get_contract($type);
+            $contracts[$type] = array(
+                'title'        => $title,
+                'content'      => $contract['content'],
+                'placeholders' => $contract['placeholders'],
+            );
+        }
+
+        return $contracts;
+    }
+
+    /**
+     * Get the selected clarification text page link.
+     *
+     * @return array
+     * @throws Kolai_Not_Found_Exception
+     */
+    public function get_clarification_text_link() {
+        $page_id = absint(get_option('kolai_clarification_text_page_id', 0));
+
+        if (!$page_id) {
+            throw new Kolai_Not_Found_Exception('Clarification text page is not configured');
+        }
+
+        $page = get_post($page_id);
+        if (!$page || $page->post_type !== 'page' || $page->post_status !== 'publish') {
+            throw new Kolai_Not_Found_Exception('Clarification text page not found');
+        }
+
+        $url = get_permalink($page_id);
+        if (!$url) {
+            throw new Kolai_Not_Found_Exception('Clarification text page URL not found');
         }
 
         return array(
-            'content'      => $content,
-            'placeholders' => $remaining,
+            'pageId' => $page_id,
+            'title'  => get_the_title($page_id),
+            'url'    => $url,
         );
     }
 
@@ -152,26 +174,22 @@ class Kolai_Contract_Service {
     }
 
     /**
-     * Build seller parameters from WP/WC options.
+     * Collect placeholders present in content.
      *
+     * @param string $content
      * @return array
      */
-    private function build_seller_params() {
-        $address_parts = array_filter(array(
-            get_option('woocommerce_store_address', ''),
-            get_option('woocommerce_store_address_2', ''),
-            get_option('woocommerce_store_city', ''),
-            get_option('woocommerce_store_postcode', ''),
-        ));
+    private function get_placeholders_for_content($content) {
+        $available_placeholders = $this->get_placeholder_definitions();
+        $placeholders = array();
 
-        return array(
-            'name'      => get_option('blogname', ''),
-            'address'   => implode(', ', $address_parts),
-            'phone'     => get_option('woocommerce_store_phone', ''),
-            'email'     => get_option('admin_email', ''),
-            'tax_id'    => get_option('kolai_seller_tax_id', ''),
-            'mersis_no' => get_option('kolai_seller_mersis_no', ''),
-        );
+        foreach ($available_placeholders as $key => $description) {
+            if (strpos($content, $key) !== false) {
+                $placeholders[$key] = $description;
+            }
+        }
+
+        return $placeholders;
     }
 
     /**

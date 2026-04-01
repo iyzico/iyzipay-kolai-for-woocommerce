@@ -95,6 +95,25 @@ class Kolai_Settings {
             array('label_for' => 'kolai_secret_key')
         );
 
+        register_setting(
+            'kolai_settings_group',
+            'kolai_clarification_text_page_id',
+            array(
+                'type' => 'integer',
+                'sanitize_callback' => 'absint',
+                'default' => 0
+            )
+        );
+
+        add_settings_field(
+            'kolai_clarification_text_page_id',
+            __('Aydinlatma Metni Sayfasi', 'kolai'),
+            array($this, 'render_clarification_text_page_field'),
+            'kolai-settings',
+            'kolai_api_section',
+            array('label_for' => 'kolai_clarification_text_page_id')
+        );
+
         // Contract settings
         register_setting(
             'kolai_contracts_group',
@@ -173,6 +192,38 @@ class Kolai_Settings {
                class="regular-text" 
                placeholder="<?php esc_attr_e('Secret Key girin', 'kolai'); ?>" />
         <p class="description"><?php esc_html_e('Kolai Secret Key\'inizi buraya girin.', 'kolai'); ?></p>
+        <?php
+    }
+
+    /**
+     * Render Clarification Text page field
+     */
+    public function render_clarification_text_page_field() {
+        $selected_page_id = absint(get_option('kolai_clarification_text_page_id', 0));
+        $pages = get_pages(array(
+            'sort_column' => 'post_title',
+            'post_status' => array('publish'),
+        ));
+        ?>
+        <select name="kolai_clarification_text_page_id"
+                id="kolai_clarification_text_page_id">
+            <option value="0"><?php esc_html_e('Sayfa secin', 'kolai'); ?></option>
+            <?php foreach ($pages as $page) : ?>
+                <option value="<?php echo esc_attr($page->ID); ?>" <?php selected($selected_page_id, $page->ID); ?>>
+                    <?php echo esc_html($page->post_title); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="description"><?php esc_html_e('API icin var olan sayfalardan bir Aydinlatma Metni sayfasi secin.', 'kolai'); ?></p>
+        <?php if ($selected_page_id) : ?>
+            <?php $page_url = get_permalink($selected_page_id); ?>
+            <?php if ($page_url) : ?>
+                <p class="description">
+                    <?php esc_html_e('Secili sayfa linki:', 'kolai'); ?>
+                    <a href="<?php echo esc_url($page_url); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($page_url); ?></a>
+                </p>
+            <?php endif; ?>
+        <?php endif; ?>
         <?php
     }
 }

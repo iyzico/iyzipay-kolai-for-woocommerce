@@ -59,6 +59,7 @@ Sonuc hex olarak kodlanir (kucuk harf).
 | `/wp-json/kolai/v1/orders/{id}`     | GET    | `RETRIEVE_ORDER`                |
 | `/wp-json/kolai/v1/orders/{id}`     | PATCH  | `UPDATE_ORDER_STATUS`           |
 | `/wp-json/kolai/v1/contracts`       | POST   | `RETRIEVE_CONTRACT`             |
+| `/wp-json/kolai/v1/contracts/clarification-text` | GET | `RETRIEVE_CONTRACT` |
 
 ## Hata Yaniti
 

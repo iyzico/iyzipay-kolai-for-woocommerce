@@ -36,41 +36,38 @@ class Kolai_Contract_Routes extends Kolai_Route_Base {
     public function register_routes() {
         register_rest_route('kolai/v1', '/contracts', array(
             'methods'             => 'POST',
-            'callback'            => array($this, 'retrieve_contract'),
+            'callback'            => array($this, 'retrieve_contracts'),
+            'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_CONTRACT),
+        ));
+
+        register_rest_route('kolai/v1', '/contracts/clarification-text', array(
+            'methods'             => 'GET',
+            'callback'            => array($this, 'get_clarification_text'),
             'permission_callback' => Kolai_Auth::permission_callback(Kolai_Auth::SCOPE_RETRIEVE_CONTRACT),
         ));
     }
 
     /**
-     * Retrieve contract template with seller info filled in.
-     * Remaining placeholders are returned as-is for the client to replace.
+     * Retrieve all contract templates with placeholders preserved for the client.
      *
-     * @param WP_REST_Request $request REST request object.
+     * @param WP_REST_Request $_request REST request object.
      * @return WP_REST_Response
      */
-    public function retrieve_contract($request) {
-        return $this->handle(function () use ($request) {
-            $body = $request->get_json_params();
+    public function retrieve_contracts($_request) {
+        return $this->handle(function () {
+            return $this->contract_service->get_contracts();
+        });
+    }
 
-            if (empty($body) || !isset($body['type'])) {
-                throw new Kolai_Invalid_Contract_Request_Exception('Missing required field: type');
-            }
-
-            $type = sanitize_text_field($body['type']);
-            $types = $this->contract_service->get_available_types();
-
-            if (!isset($types[$type])) {
-                throw new Kolai_Invalid_Contract_Type_Exception("Invalid contract type: {$type}");
-            }
-
-            $contract = $this->contract_service->get_contract($type);
-
-            return array(
-                'type'         => $type,
-                'title'        => $types[$type],
-                'content'      => $contract['content'],
-                'placeholders' => $contract['placeholders'],
-            );
+    /**
+     * Retrieve the configured clarification text page URL.
+     *
+     * @param WP_REST_Request $_request REST request object.
+     * @return WP_REST_Response
+     */
+    public function get_clarification_text($_request) {
+        return $this->handle(function () {
+            return $this->contract_service->get_clarification_text_link();
         });
     }
 }

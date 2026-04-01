@@ -61,6 +61,9 @@ $seller_mersis_no = get_option('kolai_seller_mersis_no', '');
         <?php settings_fields('kolai_contracts_group'); ?>
 
         <h2><?php esc_html_e('Satici Bilgileri', 'kolai'); ?></h2>
+        <p class="description">
+            <?php esc_html_e('Bu alanlar API yanitinda otomatik doldurulmaz; gerekli satici bilgileri istemci tarafinda replace edilmelidir.', 'kolai'); ?>
+        </p>
         <table class="form-table">
             <tr>
                 <th scope="row">

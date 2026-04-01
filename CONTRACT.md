@@ -1,4 +1,4 @@
-# Kolai API – Sozlesme (Contract) Endpoint'leri
+# Kolai API - Sozlesme (Contract) Endpoint'leri
 
 Base URL: `https://your-site.com/wp-json/kolai/v1`
 
@@ -6,15 +6,16 @@ Genel response formati ve hata kodlari icin [README.md](README.md) dosyasina bak
 
 ## Hata Kodlari (Contract)
 
-- `5000` Invalid contract type
-- `5001` Invalid contract request
+- `1002` Not found
 - `5002` Contract not found
 
 ---
 
 ## POST /contracts
 
-Belirtilen sozlesme sablonunu satici bilgileri doldurulmus sekilde dondurur. Alici, siparis ve kargo bilgileri icin `{{placeholder}}` formati korunur — bu alanlari doldurmak istemci (mobil) tarafin sorumlulugundadir.
+Tum sozlesme sablonlarini tek request ile dondurur. `distance_sales` ve `preliminary_info` icerikleri birlikte gelir.
+
+Tum placeholder'lar, `{{seller_*}}` alanlari dahil, oldugu gibi korunur. Sozlesme icerigindeki tum alanlari doldurmak istemci (mobil) tarafin sorumlulugundadir.
 
 ### Request
 
@@ -22,22 +23,11 @@ Belirtilen sozlesme sablonunu satici bilgileri doldurulmus sekilde dondurur. Ali
 POST /wp-json/kolai/v1/contracts
 ```
 
+Request body zorunlu degildir. Bos body veya bos JSON gonderilebilir:
+
 ```json
-{
-  "type": "distance_sales"
-}
+{}
 ```
-
-| Alan | Tip | Zorunlu | Aciklama |
-|------|-----|---------|----------|
-| `type` | string | Evet | Sozlesme tipi: `distance_sales` veya `preliminary_info` |
-
-### Sozlesme Tipleri
-
-| Tip | Aciklama |
-|-----|----------|
-| `distance_sales` | Mesafeli Satis Sozlesmesi |
-| `preliminary_info` | On Bilgilendirme Formu |
 
 ### Response (success)
 
@@ -51,39 +41,70 @@ POST /wp-json/kolai/v1/contracts
   "wordpressVersion": "6.9.1",
   "phpVersion": "8.2.4",
   "data": {
-    "type": "distance_sales",
-    "title": "Mesafeli Satis Sozlesmesi",
-    "content": "<h1>Mesafeli Satis Sozlesmesi</h1><h2>MADDE 1 - TARAFLAR</h2><h3>1.1 SATICI</h3><p><strong>Unvan:</strong> Ornek Magaza<br>...<h3>1.2 ALICI</h3><p><strong>Ad Soyad:</strong> {{buyer_name}}<br>...",
-    "placeholders": {
-      "{{buyer_name}}": "Alici adi",
-      "{{buyer_email}}": "Alici e-posta adresi",
-      "{{buyer_phone}}": "Alici telefonu",
-      "{{buyer_address}}": "Alici adresi",
-      "{{order_date}}": "Siparis tarihi",
-      "{{order_number}}": "Siparis numarasi",
-      "{{order_total}}": "Siparis toplami",
-      "{{order_currency}}": "Para birimi",
-      "{{payment_method}}": "Odeme yontemi",
-      "{{shipping_method}}": "Kargo yontemi",
-      "{{shipping_cost}}": "Kargo ucreti",
-      "{{product_list}}": "Urun listesi (HTML tablo)",
-      "{{delivery_date}}": "Tahmini teslim tarihi",
-      "{{right_of_withdrawal_period}}": "Cayma hakki suresi"
+    "distance_sales": {
+      "title": "Mesafeli Satis Sozlesmesi",
+      "content": "<h1>Mesafeli Satis Sozlesmesi</h1><h2>MADDE 1 - TARAFLAR</h2><h3>1.1 SATICI</h3><p><strong>Unvan:</strong> {{seller_name}}<br>...",
+      "placeholders": {
+        "{{seller_name}}": "Satici adi",
+        "{{seller_address}}": "Satici adresi",
+        "{{seller_phone}}": "Satici telefonu",
+        "{{seller_email}}": "Satici e-posta adresi",
+        "{{seller_tax_id}}": "Satici VKN",
+        "{{seller_mersis_no}}": "Satici MERSIS numarasi",
+        "{{buyer_name}}": "Alici adi",
+        "{{buyer_email}}": "Alici e-posta adresi",
+        "{{buyer_phone}}": "Alici telefonu",
+        "{{buyer_address}}": "Alici adresi",
+        "{{order_date}}": "Siparis tarihi",
+        "{{order_number}}": "Siparis numarasi",
+        "{{order_total}}": "Siparis toplami",
+        "{{order_currency}}": "Para birimi",
+        "{{payment_method}}": "Odeme yontemi",
+        "{{shipping_method}}": "Kargo yontemi",
+        "{{shipping_cost}}": "Kargo ucreti",
+        "{{product_list}}": "Urun listesi (HTML tablo)",
+        "{{delivery_date}}": "Tahmini teslim tarihi",
+        "{{right_of_withdrawal_period}}": "Cayma hakki suresi"
+      }
+    },
+    "preliminary_info": {
+      "title": "On Bilgilendirme Formu",
+      "content": "<h1>On Bilgilendirme Formu</h1><p>6502 sayili Tuketicinin Korunmasi Hakkinda Kanun ...",
+      "placeholders": {
+        "{{seller_name}}": "Satici adi",
+        "{{seller_address}}": "Satici adresi",
+        "{{seller_phone}}": "Satici telefonu",
+        "{{seller_email}}": "Satici e-posta adresi",
+        "{{seller_tax_id}}": "Satici VKN",
+        "{{seller_mersis_no}}": "Satici MERSIS numarasi",
+        "{{buyer_name}}": "Alici adi",
+        "{{buyer_email}}": "Alici e-posta adresi",
+        "{{buyer_phone}}": "Alici telefonu",
+        "{{buyer_address}}": "Alici adresi",
+        "{{order_date}}": "Siparis tarihi",
+        "{{order_number}}": "Siparis numarasi",
+        "{{order_total}}": "Siparis toplami",
+        "{{order_currency}}": "Para birimi",
+        "{{payment_method}}": "Odeme yontemi",
+        "{{shipping_method}}": "Kargo yontemi",
+        "{{shipping_cost}}": "Kargo ucreti",
+        "{{product_list}}": "Urun listesi (HTML tablo)",
+        "{{delivery_date}}": "Tahmini teslim tarihi",
+        "{{right_of_withdrawal_period}}": "Cayma hakki suresi"
+      }
     }
   }
 }
 ```
 
-`content` icindeki satici bilgileri (`{{seller_*}}`) WP/WC ayarlarindan otomatik doldurulur. Geri kalan placeholder'lar `{{key}}` formatinda kalir ve `placeholders` nesnesinde listelenir. Istemci taraf bu placeholder'lari kendi elindeki verilerle (alici, siparis, sepet) replace ederek sozlesmeyi render eder.
-
-### Response (invalid contract type)
+### Response (template not found)
 
 ```json
 {
   "status": "failure",
   "systemTime": "2026-03-25T12:00:00+00:00",
-  "errorCode": "5000",
-  "errorMessage": "Invalid contract type: unknown",
+  "errorCode": "5002",
+  "errorMessage": "Contract template not found for type: distance_sales",
   "woocommerceVersion": "10.4.3",
   "wordpressVersion": "6.9.1",
   "phpVersion": "8.2.4",
@@ -91,14 +112,45 @@ POST /wp-json/kolai/v1/contracts
 }
 ```
 
-### Response (missing type)
+---
+
+## GET /contracts/clarification-text
+
+Ayarlar sayfasinda secilen Aydinlatma Metni sayfasinin linkini dondurur.
+
+### Request
+
+```
+GET /wp-json/kolai/v1/contracts/clarification-text
+```
+
+### Response (success)
+
+```json
+{
+  "status": "success",
+  "systemTime": "2026-03-25T12:00:00+00:00",
+  "errorCode": null,
+  "errorMessage": null,
+  "woocommerceVersion": "10.4.3",
+  "wordpressVersion": "6.9.1",
+  "phpVersion": "8.2.4",
+  "data": {
+    "pageId": 42,
+    "title": "Aydinlatma Metni",
+    "url": "https://your-site.com/aydinlatma-metni/"
+  }
+}
+```
+
+### Response (page not configured or not found)
 
 ```json
 {
   "status": "failure",
   "systemTime": "2026-03-25T12:00:00+00:00",
-  "errorCode": "5001",
-  "errorMessage": "Missing required field: type",
+  "errorCode": "1002",
+  "errorMessage": "Clarification text page is not configured",
   "woocommerceVersion": "10.4.3",
   "wordpressVersion": "6.9.1",
   "phpVersion": "8.2.4",
@@ -110,20 +162,20 @@ POST /wp-json/kolai/v1/contracts
 
 ## Yer Tutucular (Placeholders)
 
-Sablonlarda `{{placeholder}}` formati kullanilir. Satici placeholder'lari sunucu tarafinda otomatik doldurulur; geri kalanlari istemci tarafinda doldurulur.
+Sablonlarda `{{placeholder}}` formati kullanilir. Tum alanlar istemci tarafinda doldurulur.
 
-### Satici Bilgileri (sunucu tarafinda doldurulur)
+### Satici Bilgileri
 
-| Yer Tutucu | Kaynak |
-|------------|--------|
-| `{{seller_name}}` | `get_option('blogname')` |
-| `{{seller_address}}` | WooCommerce magaza adres ayarlari |
-| `{{seller_phone}}` | `get_option('woocommerce_store_phone')` |
-| `{{seller_email}}` | `get_option('admin_email')` |
-| `{{seller_tax_id}}` | `get_option('kolai_seller_tax_id')` |
-| `{{seller_mersis_no}}` | `get_option('kolai_seller_mersis_no')` |
+| Yer Tutucu | Aciklama |
+|------------|----------|
+| `{{seller_name}}` | Satici adi |
+| `{{seller_address}}` | Satici adresi |
+| `{{seller_phone}}` | Satici telefonu |
+| `{{seller_email}}` | Satici e-posta adresi |
+| `{{seller_tax_id}}` | Satici VKN |
+| `{{seller_mersis_no}}` | Satici MERSIS numarasi |
 
-### Alici / Siparis Bilgileri (istemci tarafinda doldurulur)
+### Alici / Siparis Bilgileri
 
 | Yer Tutucu | Aciklama |
 |------------|----------|
@@ -146,10 +198,14 @@ Sablonlarda `{{placeholder}}` formati kullanilir. Satici placeholder'lari sunucu
 
 ## Yonetici Paneli
 
+WP Admin > Kolai > Ayarlar sayfasindan:
+
+- Var olan WordPress sayfalari arasindan bir Aydinlatma Metni sayfasi secilebilir
+
 WP Admin > Kolai > Sozlesmeler sayfasindan:
 
-- **Satici VKN ve MERSIS numarasi** girilir
-- Her iki sozlesme sablonu **wp_editor** ile duzenlenebilir
-- Yer tutucu referans paneli acilir/kapanir seklinde goruntulenebilir
-- Sablonlar `wp_options` tablosunda saklanir (`kolai_contract_distance_sales`, `kolai_contract_preliminary_info`)
+- Satici VKN ve MERSIS numarasi girilebilir; API bu alanlari otomatik replace etmez
+- Her iki sozlesme sablonu `wp_editor` ile duzenlenebilir
+- Yer tutucu referans paneli acilir/kapanir sekilde goruntulenebilir
+- Sablonlar `wp_options` tablosunda saklanir (`kolai_contract_distance_sales`, `kolai_contract_preliminary_info`, `kolai_clarification_text_page_id`)
 - Sablon bos birakilirsa varsayilan Turkce sablon kullanilir
