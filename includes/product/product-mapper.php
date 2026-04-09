@@ -55,6 +55,9 @@ class Kolai_Product_Mapper {
             $mapped['inStock'] = (bool) $product_data['in_stock'];
         }
         
+        // Currency
+        $mapped['currency'] = get_woocommerce_currency();
+
         // Price (as string with currency format)
         if (isset($product_data['price'])) {
             $mapped['price'] = (string) number_format(floatval($product_data['price']), 2, '.', '');

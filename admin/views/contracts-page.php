@@ -50,8 +50,14 @@ if (empty($preliminary_info_content)) {
     $preliminary_info_content = $contract_service->get_template('preliminary_info');
 }
 
+$seller_name = get_option('kolai_seller_name', '');
+$seller_address = get_option('kolai_seller_address', '');
+$seller_phone = get_option('kolai_seller_phone', '');
+$seller_email = get_option('kolai_seller_email', '');
 $seller_tax_id = get_option('kolai_seller_tax_id', '');
 $seller_mersis_no = get_option('kolai_seller_mersis_no', '');
+$delivery_date = get_option('kolai_delivery_date', '');
+$right_of_withdrawal_period = get_option('kolai_right_of_withdrawal_period', '');
 ?>
 
 <div class="wrap">
@@ -62,9 +68,61 @@ $seller_mersis_no = get_option('kolai_seller_mersis_no', '');
 
         <h2><?php esc_html_e('Satici Bilgileri', 'kolai'); ?></h2>
         <p class="description">
-            <?php esc_html_e('Bu alanlar API yanitinda otomatik doldurulmaz; gerekli satici bilgileri istemci tarafinda replace edilmelidir.', 'kolai'); ?>
+            <?php esc_html_e('Bu alanlar sozlesme sablonlarindaki ilgili yer tutuculari otomatik olarak doldurur.', 'kolai'); ?>
         </p>
         <table class="form-table">
+            <tr>
+                <th scope="row">
+                    <label for="kolai_seller_name"><?php esc_html_e('Satici Adi / Unvani', 'kolai'); ?></label>
+                </th>
+                <td>
+                    <input type="text"
+                           name="kolai_seller_name"
+                           id="kolai_seller_name"
+                           value="<?php echo esc_attr($seller_name); ?>"
+                           class="regular-text"
+                           placeholder="<?php esc_attr_e('Satici adi girin', 'kolai'); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="kolai_seller_address"><?php esc_html_e('Satici Adresi', 'kolai'); ?></label>
+                </th>
+                <td>
+                    <input type="text"
+                           name="kolai_seller_address"
+                           id="kolai_seller_address"
+                           value="<?php echo esc_attr($seller_address); ?>"
+                           class="large-text"
+                           placeholder="<?php esc_attr_e('Satici adresi girin', 'kolai'); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="kolai_seller_phone"><?php esc_html_e('Satici Telefonu', 'kolai'); ?></label>
+                </th>
+                <td>
+                    <input type="text"
+                           name="kolai_seller_phone"
+                           id="kolai_seller_phone"
+                           value="<?php echo esc_attr($seller_phone); ?>"
+                           class="regular-text"
+                           placeholder="<?php esc_attr_e('Satici telefonu girin', 'kolai'); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="kolai_seller_email"><?php esc_html_e('Satici E-posta Adresi', 'kolai'); ?></label>
+                </th>
+                <td>
+                    <input type="email"
+                           name="kolai_seller_email"
+                           id="kolai_seller_email"
+                           value="<?php echo esc_attr($seller_email); ?>"
+                           class="regular-text"
+                           placeholder="<?php esc_attr_e('Satici e-posta adresi girin', 'kolai'); ?>" />
+                </td>
+            </tr>
             <tr>
                 <th scope="row">
                     <label for="kolai_seller_tax_id"><?php esc_html_e('Vergi Kimlik Numarasi (VKN)', 'kolai'); ?></label>
@@ -89,6 +147,41 @@ $seller_mersis_no = get_option('kolai_seller_mersis_no', '');
                            value="<?php echo esc_attr($seller_mersis_no); ?>"
                            class="regular-text"
                            placeholder="<?php esc_attr_e('MERSIS numarasi girin', 'kolai'); ?>" />
+                </td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <h2><?php esc_html_e('Teslimat ve Cayma Hakki', 'kolai'); ?></h2>
+        <p class="description">
+            <?php esc_html_e('Bu alanlar sozlesme sablonlarindaki ilgili yer tutuculari otomatik olarak doldurur.', 'kolai'); ?>
+        </p>
+        <table class="form-table">
+            <tr>
+                <th scope="row">
+                    <label for="kolai_delivery_date"><?php esc_html_e('Tahmini Teslim Tarihi', 'kolai'); ?></label>
+                </th>
+                <td>
+                    <input type="text"
+                           name="kolai_delivery_date"
+                           id="kolai_delivery_date"
+                           value="<?php echo esc_attr($delivery_date); ?>"
+                           class="regular-text"
+                           placeholder="<?php esc_attr_e('Orn: 30 gun', 'kolai'); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="kolai_right_of_withdrawal_period"><?php esc_html_e('Cayma Hakki Suresi', 'kolai'); ?></label>
+                </th>
+                <td>
+                    <input type="text"
+                           name="kolai_right_of_withdrawal_period"
+                           id="kolai_right_of_withdrawal_period"
+                           value="<?php echo esc_attr($right_of_withdrawal_period); ?>"
+                           class="regular-text"
+                           placeholder="<?php esc_attr_e('Orn: 14 gun', 'kolai'); ?>" />
                 </td>
             </tr>
         </table>

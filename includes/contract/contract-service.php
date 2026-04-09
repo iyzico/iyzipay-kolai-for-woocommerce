@@ -35,26 +35,35 @@ class Kolai_Contract_Service {
      */
     public function get_placeholder_definitions() {
         return array(
-            '{{seller_name}}'                => 'Satici adi',
-            '{{seller_address}}'             => 'Satici adresi',
-            '{{seller_phone}}'               => 'Satici telefonu',
-            '{{seller_email}}'               => 'Satici e-posta adresi',
-            '{{seller_tax_id}}'              => 'Satici VKN',
-            '{{seller_mersis_no}}'           => 'Satici MERSIS numarasi',
             '{{buyer_name}}'                 => 'Alici adi',
             '{{buyer_email}}'                => 'Alici e-posta adresi',
             '{{buyer_phone}}'                => 'Alici telefonu',
             '{{buyer_address}}'              => 'Alici adresi',
             '{{order_date}}'                 => 'Siparis tarihi',
-            '{{order_number}}'               => 'Siparis numarasi',
             '{{order_total}}'                => 'Siparis toplami',
             '{{order_currency}}'             => 'Para birimi',
             '{{payment_method}}'             => 'Odeme yontemi',
             '{{shipping_method}}'            => 'Kargo yontemi',
             '{{shipping_cost}}'              => 'Kargo ucreti',
             '{{product_list}}'               => 'Urun listesi (HTML tablo)',
-            '{{delivery_date}}'              => 'Tahmini teslim tarihi',
-            '{{right_of_withdrawal_period}}' => 'Cayma hakki suresi',
+        );
+    }
+
+    /**
+     * Get seller and contract settings stored in admin.
+     *
+     * @return array
+     */
+    public function get_admin_replacements() {
+        return array(
+            '{{seller_name}}'                => get_option('kolai_seller_name', ''),
+            '{{seller_address}}'             => get_option('kolai_seller_address', ''),
+            '{{seller_phone}}'               => get_option('kolai_seller_phone', ''),
+            '{{seller_email}}'               => get_option('kolai_seller_email', ''),
+            '{{seller_tax_id}}'              => get_option('kolai_seller_tax_id', ''),
+            '{{seller_mersis_no}}'           => get_option('kolai_seller_mersis_no', ''),
+            '{{delivery_date}}'              => get_option('kolai_delivery_date', ''),
+            '{{right_of_withdrawal_period}}' => get_option('kolai_right_of_withdrawal_period', ''),
         );
     }
 
@@ -73,9 +82,11 @@ class Kolai_Contract_Service {
             throw new Kolai_Contract_Not_Found_Exception("Contract template not found for type: {$type}");
         }
 
+        $content = strtr($template, $this->get_admin_replacements());
+
         return array(
-            'content'      => $template,
-            'placeholders' => $this->get_placeholders_for_content($template),
+            'content'      => $content,
+            'placeholders' => $this->get_placeholders_for_content($content),
         );
     }
 
@@ -97,6 +108,14 @@ class Kolai_Contract_Service {
                 'placeholders' => $contract['placeholders'],
             );
         }
+
+        $clarification_text = null;
+        try {
+            $clarification_text = $this->get_clarification_text_link();
+        } catch (Kolai_Not_Found_Exception $e) {
+            // Page not configured — leave as null
+        }
+        $contracts['clarificationText'] = $clarification_text;
 
         return $contracts;
     }
@@ -244,7 +263,6 @@ class Kolai_Contract_Service {
 <h2>MADDE 3 - SOZLESME KONUSU URUN BILGILERI</h2>
 {{product_list}}
 <p>
-<strong>Siparis Numarasi:</strong> {{order_number}}<br>
 <strong>Siparis Tarihi:</strong> {{order_date}}<br>
 <strong>Toplam Tutar:</strong> {{order_total}} {{order_currency}}<br>
 <strong>Kargo Ucreti:</strong> {{shipping_cost}} {{order_currency}}<br>
@@ -298,7 +316,6 @@ class Kolai_Contract_Service {
 <h2>3. SIPARIS BILGILERI</h2>
 {{product_list}}
 <p>
-<strong>Siparis Numarasi:</strong> {{order_number}}<br>
 <strong>Siparis Tarihi:</strong> {{order_date}}<br>
 <strong>Urun Toplami:</strong> {{order_total}} {{order_currency}}<br>
 <strong>Kargo Ucreti:</strong> {{shipping_cost}} {{order_currency}}<br>

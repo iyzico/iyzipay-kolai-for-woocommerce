@@ -114,6 +114,68 @@ class Kolai_Settings {
             array('label_for' => 'kolai_clarification_text_page_id')
         );
 
+        // Seller info settings
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_seller_name',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_seller_address',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_seller_phone',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_seller_email',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_email',
+                'default' => ''
+            )
+        );
+
+        // Delivery and withdrawal settings
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_delivery_date',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_contracts_group',
+            'kolai_right_of_withdrawal_period',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
         // Contract settings
         register_setting(
             'kolai_contracts_group',

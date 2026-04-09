@@ -52,6 +52,7 @@ GET /wp-json/kolai/v1/products
       "permalink": "https://your-site.com/product/t-shirt",
       "date_created": "2026-01-12T09:12:00+00:00",
       "date_modified": "2026-01-15T09:12:00+00:00",
+      "currency": "TRY",
       "price": 100,
       "regular_price": 120,
       "sale_price": 100,
