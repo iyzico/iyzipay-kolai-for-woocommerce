@@ -52,13 +52,19 @@ class Kolai_Shipping_Routes extends Kolai_Route_Base {
             $params = $request->get_json_params();
 
             if (!is_array($params)) {
+                Kolai_Logger::warning('shipping', 'Invalid request body for shipment options');
                 throw new Kolai_Bad_Request_Exception('Invalid request body', Kolai_Constants::ERROR_BAD_REQUEST);
             }
 
             $products = isset($params['products']) ? $params['products'] : null;
             $address = isset($params['address']) ? $params['address'] : null;
 
+            Kolai_Logger::info('shipping', 'get_shipment_options called', array(
+                'product_count' => is_array($products) ? count($products) : 0,
+                'has_address'   => is_array($address),
+            ));
+
             return $this->shipping_service->get_shipment_options($products, $address);
-        });
+        }, $request);
     }
 }

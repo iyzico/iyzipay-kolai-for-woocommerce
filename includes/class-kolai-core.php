@@ -102,14 +102,47 @@ class Kolai_Core {
      */
     private function load_dependencies() {
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-loader.php';
+        require_once KOLAI_INCLUDES_DIR . 'class-kolai-logger.php';
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-api.php';
         require_once KOLAI_ADMIN_DIR . 'class-kolai-admin.php';
         require_once KOLAI_ADMIN_DIR . 'class-kolai-settings.php';
-        
+
         $this->loader = new Kolai_Loader();
-        
+
         // Initialize REST API
         new Kolai_API();
+
+        // Daily cron handler for log retention cleanup
+        add_action(Kolai_Logger::CRON_HOOK, array('Kolai_Logger', 'cleanup'));
+
+        // Run idempotent schema migration when plugin version changes.
+        // dbDelta is safe to call repeatedly; this catches the case where the
+        // plugin was updated via FTP/Git pull without a deactivate/reactivate
+        // cycle, which would otherwise leave the logs table missing.
+        $this->maybe_run_migrations();
+    }
+
+    /**
+     * Compare stored DB version against KOLAI_VERSION and run migrations.
+     */
+    private function maybe_run_migrations() {
+        $stored = get_option('kolai_db_version', '0');
+        if (version_compare($stored, KOLAI_VERSION, '>=')) {
+            return;
+        }
+
+        // Schema setup (idempotent) for the logs table.
+        if (class_exists('Kolai_Logger')) {
+            Kolai_Logger::create_table();
+        }
+
+        // Make sure the daily cleanup cron is scheduled even after manual
+        // upgrades (no activation hook fired).
+        if (!wp_next_scheduled(Kolai_Logger::CRON_HOOK)) {
+            wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', Kolai_Logger::CRON_HOOK);
+        }
+
+        update_option('kolai_db_version', KOLAI_VERSION);
     }
     
     /**

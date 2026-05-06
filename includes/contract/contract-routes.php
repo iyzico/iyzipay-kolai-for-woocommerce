@@ -55,8 +55,9 @@ class Kolai_Contract_Routes extends Kolai_Route_Base {
      */
     public function retrieve_contracts($_request) {
         return $this->handle(function () {
+            Kolai_Logger::info('contract', 'retrieve_contracts called');
             return $this->contract_service->get_contracts();
-        });
+        }, $_request);
     }
 
     /**
@@ -67,7 +68,8 @@ class Kolai_Contract_Routes extends Kolai_Route_Base {
      */
     public function get_clarification_text($_request) {
         return $this->handle(function () {
+            Kolai_Logger::info('contract', 'get_clarification_text called');
             return $this->contract_service->get_clarification_text_link();
-        });
+        }, $_request);
     }
 }

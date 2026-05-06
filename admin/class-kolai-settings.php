@@ -216,6 +216,80 @@ class Kolai_Settings {
                 'default' => ''
             )
         );
+
+        // Logging settings (saved on the dedicated Logs admin page)
+        register_setting(
+            'kolai_logs_group',
+            Kolai_Logger::OPTION_ENABLED,
+            array(
+                'type' => 'boolean',
+                'sanitize_callback' => array($this, 'sanitize_bool'),
+                'default' => 0,
+            )
+        );
+
+        register_setting(
+            'kolai_logs_group',
+            Kolai_Logger::OPTION_LEVEL,
+            array(
+                'type' => 'string',
+                'sanitize_callback' => array($this, 'sanitize_log_level'),
+                'default' => Kolai_Logger::LEVEL_INFO,
+            )
+        );
+
+        register_setting(
+            'kolai_logs_group',
+            Kolai_Logger::OPTION_RETENTION_DAYS,
+            array(
+                'type' => 'integer',
+                'sanitize_callback' => array($this, 'sanitize_retention_days'),
+                'default' => 7,
+            )
+        );
+    }
+
+    /**
+     * Sanitize a checkbox/boolean value (returns 1 or 0).
+     *
+     * @param mixed $value
+     * @return int
+     */
+    public function sanitize_bool($value) {
+        return (!empty($value) && $value !== '0') ? 1 : 0;
+    }
+
+    /**
+     * Sanitize log level — must be one of the supported constants.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function sanitize_log_level($value) {
+        $allowed = array(
+            Kolai_Logger::LEVEL_DEBUG,
+            Kolai_Logger::LEVEL_INFO,
+            Kolai_Logger::LEVEL_WARNING,
+            Kolai_Logger::LEVEL_ERROR,
+        );
+        return in_array($value, $allowed, true) ? $value : Kolai_Logger::LEVEL_INFO;
+    }
+
+    /**
+     * Clamp retention days to a sensible range (0 = unlimited).
+     *
+     * @param mixed $value
+     * @return int
+     */
+    public function sanitize_retention_days($value) {
+        $value = (int) $value;
+        if ($value < 0) {
+            return 0;
+        }
+        if ($value > 365) {
+            return 365;
+        }
+        return $value;
     }
     
     /**

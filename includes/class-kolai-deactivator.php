@@ -22,7 +22,15 @@ class Kolai_Deactivator {
      * Long Description.
      */
     public static function deactivate() {
-        // Add any deactivation logic here
-        // For example: cleanup temporary data, etc.
+        // Unschedule the daily log cleanup cron. The log table itself is kept
+        // intact so existing log data survives plugin deactivation/reactivation.
+        if (defined('KOLAI_INCLUDES_DIR')) {
+            require_once KOLAI_INCLUDES_DIR . 'class-kolai-logger.php';
+        }
+        $hook = class_exists('Kolai_Logger') ? Kolai_Logger::CRON_HOOK : 'kolai_logs_cleanup';
+        $timestamp = wp_next_scheduled($hook);
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, $hook);
+        }
     }
 }

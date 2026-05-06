@@ -17,3 +17,126 @@
 .kolai-settings-page .regular-text {
     width: 400px;
 }
+
+/* ===== Logs page ===== */
+.kolai-logs-wrap .kolai-logs-count {
+    font-size: 14px;
+    color: #646970;
+    font-weight: normal;
+    margin-left: 6px;
+}
+
+.kolai-logs-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 12px 0;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+}
+
+.kolai-logs-toolbar select,
+.kolai-logs-toolbar input[type="search"] {
+    margin: 0;
+}
+
+.kolai-logs-toolbar .button-link-delete {
+    margin-left: auto;
+    color: #b32d2e;
+}
+
+.kolai-logs-table {
+    margin-top: 0;
+}
+
+.kolai-logs-table td,
+.kolai-logs-table th {
+    vertical-align: top;
+    padding: 8px 10px;
+}
+
+.kolai-logs-loading,
+.kolai-logs-empty,
+.kolai-logs-error {
+    text-align: center;
+    padding: 24px !important;
+    color: #646970;
+}
+
+.kolai-logs-error {
+    color: #b32d2e;
+}
+
+.kolai-log-time {
+    font-family: Menlo, Consolas, monospace;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.kolai-log-route {
+    font-family: Menlo, Consolas, monospace;
+    font-size: 12px;
+    word-break: break-all;
+}
+
+.kolai-log-rid {
+    font-size: 11px;
+    color: #8c8f94;
+    margin-top: 2px;
+}
+
+.kolai-log-message {
+    font-weight: 500;
+}
+
+.kolai-log-data {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 10px;
+    margin: 6px 0 0;
+    border-radius: 4px;
+    font-family: Menlo, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.kolai-log-toggle {
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.kolai-log-level {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kolai-log-level--debug   { background: #f0f0f1; color: #50575e; }
+.kolai-log-level--info    { background: #d4edff; color: #135e96; }
+.kolai-log-level--warning { background: #fcf9e8; color: #8a6d18; }
+.kolai-log-level--error   { background: #fcf0f1; color: #b32d2e; }
+
+.kolai-log-row--error td {
+    background: rgba(220, 50, 50, 0.04);
+}
+.kolai-log-row--warning td {
+    background: rgba(220, 165, 50, 0.04);
+}
+
+.kolai-logs-pagination {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}

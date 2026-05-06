@@ -37,6 +37,7 @@ class Kolai_Order_Service {
         }
 
         if (!is_array($payload)) {
+            Kolai_Logger::warning('order', 'Order payload is not an array');
             throw new Kolai_Invalid_Order_Request_Exception('Invalid request body');
         }
 
@@ -47,11 +48,23 @@ class Kolai_Order_Service {
         $shipment_option_id = isset($payload['shipmentOptionId']) ? $payload['shipmentOptionId'] : null;
         $discount_amount = isset($payload['discountAmount']) ? $payload['discountAmount'] : null;
 
+        Kolai_Logger::debug('order', 'create_order parsing payload', array(
+            'product_count'        => is_array($products) ? count($products) : 0,
+            'has_billing'          => is_array($billing),
+            'has_shipping'         => is_array($shipping),
+            'shipment_option_id'   => $shipment_option_id,
+            'has_discount'         => $discount_amount !== null,
+        ));
+
         $this->validate_buyer($buyer);
         $this->validate_billing_invoice($billing);
         Kolai_Address::validate_address($billing);
         Kolai_Address::validate_address($shipping);
         $items = $this->validate_products($products);
+
+        Kolai_Logger::debug('order', 'create_order validation passed', array(
+            'item_count' => count($items),
+        ));
 
         if (empty($shipment_option_id)) {
             throw new Kolai_Invalid_Shipment_Option_Exception('shipmentOptionId is required');
@@ -59,8 +72,13 @@ class Kolai_Order_Service {
 
         $order = wc_create_order();
         if (is_wp_error($order)) {
+            Kolai_Logger::error('order', 'wc_create_order failed', array(
+                'error' => $order->get_error_message(),
+            ));
             throw new Kolai_Internal_Error_Exception('Order creation failed');
         }
+
+        Kolai_Logger::info('order', 'Order shell created', array('order_id' => $order->get_id()));
 
         $customer_id = $this->resolve_customer_id($buyer['email']);
         if ($customer_id) {
@@ -94,6 +112,12 @@ class Kolai_Order_Service {
 
         $order->set_status('pending');
         $order->save();
+
+        Kolai_Logger::info('order', 'Order saved', array(
+            'order_id' => $order->get_id(),
+            'total'    => (float) $order->get_total(),
+            'status'   => $order->get_status(),
+        ));
 
         $hold_minutes = (int) get_option('woocommerce_hold_stock_minutes', 60);
         if ($hold_minutes < 1) {

@@ -16,12 +16,54 @@ Genel response formatı ve hata kodları için [README.md](README.md) dosyasına
 
 ## GET /products
 
-Tum urunleri listeler.
+Ürünleri **sayfalanmış** olarak listeler. Büyük katalog için tek istekte tüm ürünleri çekmeye çalışmayın — endpoint zorunlu olarak sayfalama uygular.
 
-### Request
+### Query parametreleri
+
+| Param | Tip | Default | Açıklama |
+|---|---|---|---|
+| `page` | int | `1` | 1-tabanlı sayfa indeksi |
+| `per_page` | int | `100` | Sayfa başı kayıt; **maksimum 200** |
+| `ids` | csv int[] | — | Sadece belirli ID'leri getir; pagination atlanır |
+| `modified_after` | ISO-8601 | — | Bu tarihten sonra değiştirilen ürünler (incremental sync) |
+
+### Pagination Metadatası (Body)
+
+Pagination bilgisi response **body** envelope'ı içinde, `data` dizisinin yanında ayrı bir `pagination` alanı olarak döner. Daha önce HTTP header'lar denenmişti ancak bazı proxy yığınları (Cloudflare strict, HTTP/2) `Header field must only have a single value` hatası ürettiği için body'ye taşındı.
+
+| Alan | Açıklama |
+|---|---|
+| `pagination.total` | Filtreye uyan toplam ürün sayısı |
+| `pagination.totalPages` | Toplam sayfa sayısı |
+| `pagination.page` | Mevcut sayfa |
+| `pagination.perPage` | Mevcut sayfa boyutu |
+
+### Liste Ürün Şeması (Lite)
+
+Liste yanıtında her ürün **özet** alanları içerir. `attributes`, `variations`, `gallery`, `downloads`, `tags`, `categories` gibi ağır alanlar liste yanıtına dahil değildir — bunlar için `GET /products/{id}` veya `GET /products-with-variants/{id}` çağrılır.
+
+Mapper aracılığıyla aşağıdaki alanlar (mevcutsa) döner:
 
 ```
+id, title, link, imageLink, inStock, currency, price, salePrice,
+salePriceEffectiveDate, productType, gtin, mpn, itemGroupId,
+productLength, productWidth, productHeight, productWeight
+```
+
+### Request örnekleri
+
+```
+# İlk sayfa (default 100 ürün)
 GET /wp-json/kolai/v1/products
+
+# 200'er ürünlük 3. sayfa
+GET /wp-json/kolai/v1/products?page=3&per_page=200
+
+# Belirli ID'leri batch olarak çek
+GET /wp-json/kolai/v1/products?ids=12,34,56
+
+# Son 24 saatte değişenler
+GET /wp-json/kolai/v1/products?modified_after=2026-05-05T00:00:00Z
 ```
 
 ### Response (success)
@@ -29,85 +71,66 @@ GET /wp-json/kolai/v1/products
 ```json
 {
   "status": "success",
-  "systemTime": "2026-02-04T10:15:30+00:00",
+  "systemTime": "2026-05-06T10:15:30+00:00",
   "errorCode": null,
   "errorMessage": null,
-  "woocommerceVersion": "9.1.0",
-  "wordpressVersion": "6.5.3",
-  "phpVersion": "8.1.20",
+  "woocommerceVersion": "10.7.0",
+  "wordpressVersion": "6.9.4",
+  "phpVersion": "8.2.4",
   "data": [
     {
-      "id": 12,
-      "name": "T-Shirt",
-      "slug": "t-shirt",
-      "type": "simple",
-      "status": "publish",
-      "featured": false,
-      "catalog_visibility": "visible",
-      "description": "...",
-      "short_description": "...",
-      "sku": "TS-001",
-      "menu_order": 0,
-      "virtual": false,
-      "permalink": "https://your-site.com/product/t-shirt",
-      "date_created": "2026-01-12T09:12:00+00:00",
-      "date_modified": "2026-01-15T09:12:00+00:00",
-      "currency": "TRY",
-      "price": 100,
-      "regular_price": 120,
-      "sale_price": 100,
-      "date_on_sale_from": null,
-      "date_on_sale_to": null,
-      "total_sales": 5,
-      "tax_status": "taxable",
-      "tax_class": "",
-      "sold_individually": false,
-      "purchase_note": "",
-      "shipping_class_id": 0,
+      "id": "12",
+      "title": "T-Shirt",
+      "link": "https://your-site.com/product/t-shirt",
+      "imageLink": "https://.../t-shirt.jpg",
       "inStock": true,
-      "weight": 0.5,
-      "dimensions": { "length": 10, "width": 20, "height": 2 },
-      "upsell_ids": [],
-      "cross_sell_ids": [],
-      "parent_id": 0,
-      "attributes": [],
-      "default_attributes": [],
-      "variations": [
-        {
-          "id": 101,
-          "sku": "TS-001-RED-M",
-          "description": "Kirmizi / M beden",
-          "price": 100,
-          "sale_price": 100,
-          "inStock": true,
-          "attributes": [
-            { "id": 11, "name": "Renk", "slug": "pa_color", "value": "Kirmizi" },
-            { "id": 22, "name": "Beden", "slug": "pa_size", "value": "M" }
-          ],
-          "image": { "id": 10, "url": "https://...", "alt": "" }
-        }
-      ],
-      "tags": [],
-      "downloadable": false,
-      "downloads": [],
-      "download_limit": -1,
-      "download_expiry": -1,
-      "image": { "id": 1, "url": "https://...", "alt": "" },
-      "gallery": [],
-      "reviews_allowed": true,
-      "rating_counts": [],
-      "average_rating": "0",
-      "review_count": 0
+      "currency": "TRY",
+      "price": "100.00",
+      "salePrice": "89.00",
+      "productType": "simple",
+      "gtin": "TS-001",
+      "mpn": "TS-001",
+      "productWeight": "0.5",
+      "productLength": "10",
+      "productWidth": "20",
+      "productHeight": "2"
     }
-  ]
+  ],
+  "pagination": {
+    "page": 1,
+    "perPage": 200,
+    "total": 12000,
+    "totalPages": 60
+  }
 }
 ```
+
+> Not: `pagination` alanı yalnızca `GET /products` listesinde döner. Tek ürün endpoint'lerinde (`/products/{id}`, `/products-with-variants/{id}`) bulunmaz.
+
+### Senkronizasyon Önerisi
+
+12K+ ürünlü katalogda en verimli senkronizasyon akışı:
+
+1. İlk full sync için sayfa sayfa dolaş — `data.pagination.totalPages` toplam sayfa sayısını verir:
+   ```
+   GET /products?page=1&per_page=200   → response.pagination.total / totalPages oku
+   GET /products?page=2&per_page=200
+   ...
+   ```
+2. Detay gerekiyorsa her ürün için:
+   ```
+   GET /products/{id}
+   ```
+3. Sonraki sync'lerde:
+   ```
+   GET /products?modified_after={son_sync_zamani}
+   ```
 
 ---
 
 ## GET /products/{id}
 
-Tek urun getirir. Var olan bir urun degilse hata doner.
+Tek ürünü **tüm detaylarıyla** (attributes, variations, gallery, kategoriler, etiketler dahil) getirir. Var olmayan ürün için 404 döner.
 
 ### Request
 
@@ -120,54 +143,49 @@ GET /wp-json/kolai/v1/products/12
 ```json
 {
   "status": "success",
-  "systemTime": "2026-02-04T10:15:30+00:00",
+  "systemTime": "2026-05-06T10:15:30+00:00",
   "errorCode": null,
   "errorMessage": null,
-  "woocommerceVersion": "9.1.0",
-  "wordpressVersion": "6.5.3",
-  "phpVersion": "8.1.20",
+  "woocommerceVersion": "10.7.0",
+  "wordpressVersion": "6.9.4",
+  "phpVersion": "8.2.4",
   "data": {
-    "id": 12,
-    "name": "T-Shirt",
-    "slug": "t-shirt",
-    "type": "simple",
-    "status": "publish",
-    "featured": false,
-    "catalog_visibility": "visible",
+    "id": "12",
+    "title": "T-Shirt",
     "description": "...",
-    "short_description": "...",
-    "sku": "TS-001",
-    "menu_order": 0,
-    "virtual": false,
-    "permalink": "https://your-site.com/product/t-shirt",
-    "date_created": "2026-01-12T09:12:00+00:00",
-    "date_modified": "2026-01-15T09:12:00+00:00",
-    "price": 100,
-    "regular_price": 120,
-    "sale_price": 100,
-    "date_on_sale_from": null,
-    "date_on_sale_to": null,
-    "total_sales": 5,
-    "tax_status": "taxable",
-    "tax_class": "",
-    "sold_individually": false,
-    "purchase_note": "",
-    "shipping_class_id": 0,
+    "link": "https://your-site.com/product/t-shirt",
+    "imageLink": "https://.../t-shirt.jpg",
+    "additionalImageLinks": ["https://.../1.jpg", "https://.../2.jpg"],
     "inStock": true,
-    "weight": 0.5,
-    "dimensions": { "length": 10, "width": 20, "height": 2 },
-    "upsell_ids": [],
-    "cross_sell_ids": [],
-    "parent_id": 0,
-    "attributes": [],
-    "default_attributes": [],
+    "currency": "TRY",
+    "price": "100.00",
+    "salePrice": "89.00",
+    "salePriceEffectiveDate": "2026-05-01T00:00:00+00:00/2026-05-31T23:59:59+00:00",
+    "productType": "variable",
+    "gtin": "TS-001",
+    "mpn": "TS-001",
+    "productWeight": "0.5",
+    "productLength": "10",
+    "productWidth": "20",
+    "productHeight": "2",
+    "attributes": [
+      {
+        "name": "Renk",
+        "slug": "pa_color",
+        "type": "taxonomy",
+        "visible": true,
+        "options": [
+          { "id": 11, "name": "Kirmizi", "slug": "kirmizi" }
+        ]
+      }
+    ],
     "variations": [
       {
         "id": 101,
         "sku": "TS-001-RED-M",
         "description": "Kirmizi / M beden",
-        "price": 100,
-        "sale_price": 100,
+        "price": "100.00",
+        "salePrice": "89.00",
         "inStock": true,
         "attributes": [
           { "id": 11, "name": "Renk", "slug": "pa_color", "value": "Kirmizi" },
@@ -175,33 +193,26 @@ GET /wp-json/kolai/v1/products/12
         ],
         "image": { "id": 10, "url": "https://...", "alt": "" }
       }
-    ],
-    "tags": [],
-    "downloadable": false,
-    "downloads": [],
-    "download_limit": -1,
-    "download_expiry": -1,
-    "image": { "id": 1, "url": "https://...", "alt": "" },
-    "gallery": [],
-    "reviews_allowed": true,
-    "rating_counts": [],
-    "average_rating": "0",
-    "review_count": 0
+    ]
   }
 }
 ```
+
+> **Notlar**
+> - Variable ürünlerde **maksimum 100 varyasyon** dönülür. Üstündeki varyasyonlu üründe son satıra `{ "_truncated": true, "_max": 100 }` markörü eklenir; `warning` seviyesinde log üretilir.
+> - Ürün bir **varyasyon** ID'si ile çağrıldıysa parent ürüne yönlendirme yapılmaz; bunun için `/products-with-variants/{id}` kullanın.
 
 ### Response (error example)
 
 ```json
 {
   "status": "failure",
-  "systemTime": "2026-02-04T10:15:30+00:00",
+  "systemTime": "2026-05-06T10:15:30+00:00",
   "errorCode": "2001",
   "errorMessage": "Product not found",
-  "woocommerceVersion": "9.1.0",
-  "wordpressVersion": "6.5.3",
-  "phpVersion": "8.1.20",
+  "woocommerceVersion": "10.7.0",
+  "wordpressVersion": "6.9.4",
+  "phpVersion": "8.2.4",
   "data": null
 }
 ```
@@ -210,7 +221,7 @@ GET /wp-json/kolai/v1/products/12
 
 ## GET /products-with-variants/{id}
 
-Urun veya varyasyon ID'si ile cagrilir. ID bir **varyasyon** (child) ise, ilgili **parent** urun tum varyasyonlariyla birlikte dondurulur; parent ID ise urun oldugu gibi dondurulur. Detay icin [README](README.md) veya uygulama koduna bakin.
+Ürün veya varyasyon ID'si ile çağrılır. ID bir **varyasyon** (child) ise, ilgili **parent** ürün tüm varyasyonlarıyla birlikte döndürülür; parent ID ise ürün olduğu gibi döndürülür.
 
 ### Request
 
@@ -218,4 +229,18 @@ Urun veya varyasyon ID'si ile cagrilir. ID bir **varyasyon** (child) ise, ilgili
 GET /wp-json/kolai/v1/products-with-variants/12
 ```
 
-Response yapisi GET /products/{id} ile ayni formattadir.
+Response yapısı `GET /products/{id}` ile aynı formattadır.
+
+---
+
+## Performans Notları
+
+`/products` endpoint'i 12K+ ürünlü kataloglar için aşağıdaki optimizasyonları uygular:
+
+- **Bulk cache priming**: Sayfada dönen tüm ürünler için `_prime_post_caches`, `update_object_term_cache`, `update_meta_cache` tek seferde çağrılarak N+1 desenli sorgu çoğalması önlenir.
+- **Hard limit `per_page=200`**: PHP timeout / OOM riskini sınırlar.
+- **Lite formatter**: Liste yanıtında attribute/variation/gallery/downloads/categories/tags **tamamen** atlanır.
+- **Term'ler batch çekilir**: `get_terms(include => [...])` ile tek sorguda alınır.
+- **Variation tavanı**: `MAX_VARIATIONS_PER_PRODUCT = 100`.
+
+Performans veya hata teşhisi için **Kolai → Loglar** sayfasından `product` bağlamındaki kayıtları izleyin (her sorgunun süresi `duration_ms` ile birlikte yazılır). Detaylar için [LOGS.md](LOGS.md).

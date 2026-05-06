@@ -84,8 +84,12 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
     public function create_order($request) {
         return $this->handle(function() use ($request) {
             $params = $request->get_json_params();
+            Kolai_Logger::info('order', 'create_order called', array(
+                'has_params'    => is_array($params),
+                'product_count' => is_array($params) && isset($params['products']) ? count($params['products']) : 0,
+            ));
             return $this->order_service->create_order($params);
-        });
+        }, $request);
     }
 
     /**
@@ -96,8 +100,9 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
      */
     public function get_order_types($request) {
         return $this->handle(function() {
+            Kolai_Logger::info('order', 'get_order_types called');
             return $this->order_service->get_order_types();
-        });
+        }, $request);
     }
 
     /**
@@ -109,8 +114,9 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
     public function get_order($request) {
         return $this->handle(function() use ($request) {
             $order_id = (int) $request->get_param('orderId');
+            Kolai_Logger::info('order', 'get_order called', array('order_id' => $order_id));
             return $this->order_service->get_order_by_id($order_id);
-        });
+        }, $request);
     }
 
     /**
@@ -123,7 +129,11 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
         return $this->handle(function() use ($request) {
             $order_id = (int) $request->get_param('orderId');
             $params = $request->get_json_params();
+            Kolai_Logger::info('order', 'update_order called', array(
+                'order_id' => $order_id,
+                'fields'   => is_array($params) ? array_keys($params) : array(),
+            ));
             return $this->order_service->update_order_status($order_id, $params ? $params : array());
-        });
+        }, $request);
     }
 }

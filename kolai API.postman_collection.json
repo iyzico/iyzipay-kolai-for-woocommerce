@@ -1,0 +1,1193 @@
+{
+  "info": {
+    "_postman_id": "57cbf339-6eb1-4edf-abef-0356b8619993",
+    "name": "kolai API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33086457",
+    "_collection_link": "https://go.postman.co/collection/33086457-57cbf339-6eb1-4edf-abef-0356b8619993?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get All Products",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "variant_id",
+              "value": "",
+              "description": "Optional variant ID",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "variant_id",
+                  "value": "",
+                  "description": "Optional variant ID",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:47:57 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "GET"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"success\",\n    \"systemTime\": \"2026-02-04T12:47:57+00:00\",\n    \"errorCode\": null,\n    \"errorMessage\": null,\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": [\n        {\n            \"id\": \"66\",\n            \"title\": \"Siyah Ayakkabı\",\n            \"description\": \"\",\n            \"link\": \"https://wp-fast.local/product/siyah-ayakkabi/\",\n            \"imageLink\": \"https://wp-fast.local/wp-content/uploads/2025/10/215qiGIA0vL._SR290290_.jpg\",\n            \"availability\": \"in stock\",\n            \"price\": \"199.90\",\n            \"salePrice\": \"199.90\",\n            \"productType\": \"simple\",\n            \"gtin\": \"SKU002\",\n            \"mpn\": \"SKU002\",\n            \"categories\": [\n                {\n                    \"id\": 15,\n                    \"name\": \"Uncategorized\",\n                    \"slug\": \"uncategorized\"\n                }\n            ],\n            \"variations\": [],\n            \"attributes\": []\n        },\n        {\n            \"id\": \"26\",\n            \"title\": \"Gri Tişört\",\n            \"description\": \"\",\n            \"link\": \"https://wp-fast.local/product/gri-tisort/\",\n            \"imageLink\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n            \"availability\": \"in stock\",\n            \"price\": \"12.00\",\n            \"productType\": \"variable\",\n            \"gtin\": \"SKU001\",\n            \"mpn\": \"SKU001\",\n            \"categories\": [\n                {\n                    \"id\": 15,\n                    \"name\": \"Uncategorized\",\n                    \"slug\": \"uncategorized\"\n                }\n            ],\n            \"variations\": [\n                {\n                    \"id\": 81,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"12.00\",\n                    \"regularPrice\": \"123.00\",\n                    \"salePrice\": \"12.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"blue\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"42\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 82,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"0.00\",\n                    \"regularPrice\": \"0.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"blue\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"43\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 83,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"0.00\",\n                    \"regularPrice\": \"0.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"blue\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"44\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 84,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"0.00\",\n                    \"regularPrice\": \"0.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"blue\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"45\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 85,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"0.00\",\n                    \"regularPrice\": \"0.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"red\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"42\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 87,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"0.00\",\n                    \"regularPrice\": \"0.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"red\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"44\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 88,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"0.00\",\n                    \"regularPrice\": \"0.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"red\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"45\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 79,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"100.00\",\n                    \"regularPrice\": \"100.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"blue\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                },\n                {\n                    \"id\": 80,\n                    \"sku\": \"SKU001\",\n                    \"price\": \"200.00\",\n                    \"regularPrice\": \"200.00\",\n                    \"stockStatus\": \"instock\",\n                    \"stockQuantity\": 99,\n                    \"manageStock\": \"parent\",\n                    \"inStock\": true,\n                    \"attributes\": [\n                        {\n                            \"name\": \"Color\",\n                            \"slug\": \"pa_color\",\n                            \"value\": \"red\"\n                        },\n                        {\n                            \"name\": \"size\",\n                            \"slug\": \"size\",\n                            \"value\": \"\"\n                        }\n                    ],\n                    \"image\": {\n                        \"id\": 64,\n                        \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                        \"alt\": \"\"\n                    }\n                }\n            ],\n            \"attributes\": [\n                {\n                    \"name\": \"Color\",\n                    \"slug\": \"pa_color\",\n                    \"type\": \"taxonomy\",\n                    \"visible\": true,\n                    \"options\": [\n                        {\n                            \"id\": 18,\n                            \"name\": \"Blue\",\n                            \"slug\": \"blue\"\n                        },\n                        {\n                            \"id\": 17,\n                            \"name\": \"Red\",\n                            \"slug\": \"red\"\n                        }\n                    ]\n                },\n                {\n                    \"name\": \"size\",\n                    \"slug\": \"size\",\n                    \"type\": \"custom\",\n                    \"visible\": true,\n                    \"options\": [\n                        {\n                            \"name\": \"42\",\n                            \"slug\": \"42\"\n                        },\n                        {\n                            \"name\": \"43\",\n                            \"slug\": \"43\"\n                        },\n                        {\n                            \"name\": \"44\",\n                            \"slug\": \"44\"\n                        },\n                        {\n                            \"name\": \"45\",\n                            \"slug\": \"45\"\n                        }\n                    ]\n                }\n            ]\n        }\n    ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Product Details",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/products/:product_id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            ":product_id"
+          ],
+          "query": [
+            {
+              "key": "variant_id",
+              "value": "",
+              "description": "Optional variant ID",
+              "disabled": true
+            }
+          ],
+          "variable": [
+            {
+              "key": "product_id",
+              "value": "123",
+              "type": "string"
+            }
+          ]
+        },
+        "description": "Get product details by ID. Optionally specify variant_id for product variations."
+      },
+      "response": [
+        {
+          "name": "failure",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/:product_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                ":product_id"
+              ],
+              "query": [
+                {
+                  "key": "variant_id",
+                  "value": "",
+                  "description": "Optional variant ID",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "123",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:48:06 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "GET"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"failure\",\n    \"systemTime\": \"2026-02-04T12:48:06+00:00\",\n    \"errorCode\": \"2001\",\n    \"errorMessage\": \"Product not found\",\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": null\n}"
+        },
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/:product_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                ":product_id"
+              ],
+              "query": [
+                {
+                  "key": "variant_id",
+                  "value": "",
+                  "description": "Optional variant ID",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "26",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:48:17 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "GET"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"success\",\n    \"systemTime\": \"2026-02-04T12:48:17+00:00\",\n    \"errorCode\": null,\n    \"errorMessage\": null,\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": {\n        \"id\": \"26\",\n        \"title\": \"Gri Tişört\",\n        \"description\": \"\",\n        \"link\": \"https://wp-fast.local/product/gri-tisort/\",\n        \"imageLink\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n        \"availability\": \"in stock\",\n        \"price\": \"12.00\",\n        \"productType\": \"variable\",\n        \"gtin\": \"SKU001\",\n        \"mpn\": \"SKU001\",\n        \"categories\": [\n            {\n                \"id\": 15,\n                \"name\": \"Uncategorized\",\n                \"slug\": \"uncategorized\"\n            }\n        ],\n        \"variations\": [\n            {\n                \"id\": 81,\n                \"sku\": \"SKU001\",\n                \"price\": \"12.00\",\n                \"regularPrice\": \"123.00\",\n                \"salePrice\": \"12.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"42\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 82,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"43\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 83,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"44\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 84,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"45\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 85,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"42\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 87,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"44\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 88,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"45\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 79,\n                \"sku\": \"SKU001\",\n                \"price\": \"100.00\",\n                \"regularPrice\": \"100.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 80,\n                \"sku\": \"SKU001\",\n                \"price\": \"200.00\",\n                \"regularPrice\": \"200.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            }\n        ],\n        \"attributes\": [\n            {\n                \"name\": \"Color\",\n                \"slug\": \"pa_color\",\n                \"type\": \"taxonomy\",\n                \"visible\": true,\n                \"options\": [\n                    {\n                        \"id\": 18,\n                        \"name\": \"Blue\",\n                        \"slug\": \"blue\"\n                    },\n                    {\n                        \"id\": 17,\n                        \"name\": \"Red\",\n                        \"slug\": \"red\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"size\",\n                \"slug\": \"size\",\n                \"type\": \"custom\",\n                \"visible\": true,\n                \"options\": [\n                    {\n                        \"name\": \"42\",\n                        \"slug\": \"42\"\n                    },\n                    {\n                        \"name\": \"43\",\n                        \"slug\": \"43\"\n                    },\n                    {\n                        \"name\": \"44\",\n                        \"slug\": \"44\"\n                    },\n                    {\n                        \"name\": \"45\",\n                        \"slug\": \"45\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+        }
+      ],
+      "variable": [
+        {
+          "key": "product_id",
+          "value": "123",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Get Product Details with Variants",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/products-with-variants/:product_id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products-with-variants",
+            ":product_id"
+          ],
+          "query": [
+            {
+              "key": "variant_id",
+              "value": "",
+              "description": "Optional variant ID",
+              "disabled": true
+            }
+          ],
+          "variable": [
+            {
+              "key": "product_id",
+              "value": "123",
+              "type": "string"
+            }
+          ]
+        },
+        "description": "Get product details by ID. Optionally specify variant_id for product variations."
+      },
+      "response": [
+        {
+          "name": "sucess",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products-with-variants/:product_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products-with-variants",
+                ":product_id"
+              ],
+              "query": [
+                {
+                  "key": "variant_id",
+                  "value": "",
+                  "description": "Optional variant ID",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "26",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:48:34 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "GET"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"success\",\n    \"systemTime\": \"2026-02-04T12:48:34+00:00\",\n    \"errorCode\": null,\n    \"errorMessage\": null,\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": {\n        \"id\": \"26\",\n        \"title\": \"Gri Tişört\",\n        \"description\": \"\",\n        \"link\": \"https://wp-fast.local/product/gri-tisort/\",\n        \"imageLink\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n        \"availability\": \"in stock\",\n        \"price\": \"12.00\",\n        \"productType\": \"variable\",\n        \"gtin\": \"SKU001\",\n        \"mpn\": \"SKU001\",\n        \"categories\": [\n            {\n                \"id\": 15,\n                \"name\": \"Uncategorized\",\n                \"slug\": \"uncategorized\"\n            }\n        ],\n        \"variations\": [\n            {\n                \"id\": 81,\n                \"sku\": \"SKU001\",\n                \"price\": \"12.00\",\n                \"regularPrice\": \"123.00\",\n                \"salePrice\": \"12.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"42\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 82,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"43\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 83,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"44\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 84,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"45\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 85,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"42\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 87,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"44\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 88,\n                \"sku\": \"SKU001\",\n                \"price\": \"0.00\",\n                \"regularPrice\": \"0.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"45\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 79,\n                \"sku\": \"SKU001\",\n                \"price\": \"100.00\",\n                \"regularPrice\": \"100.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"blue\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            },\n            {\n                \"id\": 80,\n                \"sku\": \"SKU001\",\n                \"price\": \"200.00\",\n                \"regularPrice\": \"200.00\",\n                \"stockStatus\": \"instock\",\n                \"stockQuantity\": 99,\n                \"manageStock\": \"parent\",\n                \"inStock\": true,\n                \"attributes\": [\n                    {\n                        \"name\": \"Color\",\n                        \"slug\": \"pa_color\",\n                        \"value\": \"red\"\n                    },\n                    {\n                        \"name\": \"size\",\n                        \"slug\": \"size\",\n                        \"value\": \"\"\n                    }\n                ],\n                \"image\": {\n                    \"id\": 64,\n                    \"url\": \"https://wp-fast.local/wp-content/uploads/2025/10/regular-tshirt-7b-a83.webp\",\n                    \"alt\": \"\"\n                }\n            }\n        ],\n        \"attributes\": [\n            {\n                \"name\": \"Color\",\n                \"slug\": \"pa_color\",\n                \"type\": \"taxonomy\",\n                \"visible\": true,\n                \"options\": [\n                    {\n                        \"id\": 18,\n                        \"name\": \"Blue\",\n                        \"slug\": \"blue\"\n                    },\n                    {\n                        \"id\": 17,\n                        \"name\": \"Red\",\n                        \"slug\": \"red\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"size\",\n                \"slug\": \"size\",\n                \"type\": \"custom\",\n                \"visible\": true,\n                \"options\": [\n                    {\n                        \"name\": \"42\",\n                        \"slug\": \"42\"\n                    },\n                    {\n                        \"name\": \"43\",\n                        \"slug\": \"43\"\n                    },\n                    {\n                        \"name\": \"44\",\n                        \"slug\": \"44\"\n                    },\n                    {\n                        \"name\": \"45\",\n                        \"slug\": \"45\"\n                    }\n                ]\n            }\n        ]\n    }\n}"
+        },
+        {
+          "name": "failure",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products-with-variants/:product_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products-with-variants",
+                ":product_id"
+              ],
+              "query": [
+                {
+                  "key": "variant_id",
+                  "value": "",
+                  "description": "Optional variant ID",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "123",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:48:45 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "GET"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"failure\",\n    \"systemTime\": \"2026-02-04T12:48:45+00:00\",\n    \"errorCode\": \"2001\",\n    \"errorMessage\": \"Product not found\",\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": null\n}"
+        }
+      ],
+      "variable": [
+        {
+          "key": "product_id",
+          "value": "123",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Shipping Options by Products",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"products\": [\n        66\n    ],\n    \"address\": {\n        \"countryId\": \"TR\",\n        \"cityId\": \"28\"\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/shipment-options",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "shipment-options"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [66,26],\n  \"address\": {\n    \"countryId\": \"TR\",\n    \"cityId\": \"28\",\n    \"districtId\": \"Kadikoy\",\n    \"postcode\": \"28000\",\n    \"addressLine\": \"Ornek Mah. 1. Sok. No: 2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shipment-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipment-options"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:47:28 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "POST"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"success\",\n    \"systemTime\": \"2026-02-04T12:47:28+00:00\",\n    \"errorCode\": null,\n    \"errorMessage\": null,\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": {\n        \"options\": [\n            {\n                \"id\": \"flat_rate:2\",\n                \"label\": \"PTT Kargo\",\n                \"methodId\": \"flat_rate\",\n                \"cost\": 550,\n                \"tax\": 0,\n                \"price\": 550\n            }\n        ]\n    }\n}"
+        },
+        {
+          "name": "failure",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [13],\n  \"address\": {\n    \"countryId\": \"TR\",\n    \"cityId\": \"28\",\n    \"districtId\": \"Kadikoy\",\n    \"postcode\": \"28000\",\n    \"addressLine\": \"Ornek Mah. 1. Sok. No: 2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shipment-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipment-options"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:47:45 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "POST"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"failure\",\n    \"systemTime\": \"2026-02-04T12:47:45+00:00\",\n    \"errorCode\": \"2001\",\n    \"errorMessage\": \"Product not found\",\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": null\n}"
+        }
+      ]
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"buyer\": {\n    \"email\": \"john@doe.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+90 555 000 00 00\"\n  },\n  \"billingAddress\": {\n    \"countryId\": \"TR\",\n    \"cityId\": \"34\",\n    \"districtId\": \"Kadikoy\",\n    \"postcode\": \"34710\",\n    \"addressLine\": \"Ornek Mah. 1. Sok. No: 2\",\n    \"invoiceType\": \"company\",\n    \"companyName\": \"Ornek Ltd. Sti.\",\n    \"taxId\": \"1234567890\",\n    \"taxOffice\": \"Kadikoy\"\n  },\n  \"shippingAddress\": {\n    \"countryId\": \"TR\",\n    \"cityId\": \"34\",\n    \"districtId\": \"Kadikoy\",\n    \"postcode\": \"34710\",\n    \"addressLine\": \"Ornek Mah. 1. Sok. No: 2\"\n  },\n  \"products\": [\n    { \"productId\": 66, \"quantity\": 1 }\n  ],\n  \"shipmentOptionId\": \"flat_rate:2\",\n  \"discountAmount\": 25.0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [66,26],\n  \"address\": {\n    \"countryId\": \"TR\",\n    \"cityId\": \"28\",\n    \"districtId\": \"Kadikoy\",\n    \"postcode\": \"28000\",\n    \"addressLine\": \"Ornek Mah. 1. Sok. No: 2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shipment-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipment-options"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:47:28 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "POST"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"success\",\n    \"systemTime\": \"2026-02-04T12:47:28+00:00\",\n    \"errorCode\": null,\n    \"errorMessage\": null,\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": {\n        \"options\": [\n            {\n                \"id\": \"flat_rate:2\",\n                \"label\": \"PTT Kargo\",\n                \"methodId\": \"flat_rate\",\n                \"cost\": 550,\n                \"tax\": 0,\n                \"price\": 550\n            }\n        ]\n    }\n}"
+        },
+        {
+          "name": "failure",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [13],\n  \"address\": {\n    \"countryId\": \"TR\",\n    \"cityId\": \"28\",\n    \"districtId\": \"Kadikoy\",\n    \"postcode\": \"28000\",\n    \"addressLine\": \"Ornek Mah. 1. Sok. No: 2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/shipment-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shipment-options"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Wed, 04 Feb 2026 12:47:45 GMT"
+            },
+            {
+              "key": "Server",
+              "value": "Apache/2.4.54 (Unix) mod_fastcgi/mod_fastcgi-SNAP-0910052141 OpenSSL/1.0.2u mod_wsgi/3.5 Python/2.7.18"
+            },
+            {
+              "key": "X-Powered-By",
+              "value": "PHP/8.2.4"
+            },
+            {
+              "key": "X-Robots-Tag",
+              "value": "noindex"
+            },
+            {
+              "key": "Link",
+              "value": "<https://wp-fast.local/wp-json/>; rel=\"https://api.w.org/\""
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Access-Control-Expose-Headers",
+              "value": "X-WP-Total, X-WP-TotalPages, Link"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Authorization, X-WP-Nonce, Content-Disposition, Content-MD5, Content-Type"
+            },
+            {
+              "key": "Allow",
+              "value": "POST"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5, max=100"
+            },
+            {
+              "key": "Connection",
+              "value": "Keep-Alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": \"failure\",\n    \"systemTime\": \"2026-02-04T12:47:45+00:00\",\n    \"errorCode\": \"2001\",\n    \"errorMessage\": \"Product not found\",\n    \"woocommerceVersion\": \"10.4.3\",\n    \"wordpressVersion\": \"6.9.1\",\n    \"phpVersion\": \"8.2.4\",\n    \"data\": null\n}"
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "// =========================",
+          "// IYZ-TP-v2 Auth Generator",
+          "// =========================",
+          "",
+          "pm.request.headers.remove('Authorization');",
+          "",
+          "const apiKey = '1';",
+          "const secretKey = '1';",
+          "",
+          "// Random salt",
+          "const salt = pm.variables.replaceIn('{{$guid}}');",
+          "",
+          "// Request info",
+          "const method = pm.request.method;",
+          "const rawUrl = pm.request.url.toString();",
+          "",
+          "// URI PATH — tam yol (Java URI.getPath() ile aynı, sunucudaki $_SERVER['REQUEST_URI'] ile eşleşir)",
+          "// örn: /wp-json/kolai/v1/products/123",
+          "const fullUrl = pm.variables.replaceIn(pm.request.url.toString());",
+          "const uriPath = new URL(fullUrl).pathname;",
+          "",
+          "// Request body",
+          "let requestBody = '';",
+          "",
+          "if (method !== 'GET' && pm.request.body) {",
+          "    requestBody = pm.request.body.raw || '';",
+          "}",
+          "",
+          "// Scope mapping",
+          "const scopeMap = {",
+          "    'GET /wp-json/kolai/v1/products': 'RETRIEVE_PRODUCTS',",
+          "    'GET /wp-json/kolai/v1/products-with-variants': 'RETRIEVE_PRODUCT_WITH_VARIANTS',",
+          "    'GET /wp-json/kolai/v1/order-types': 'RETRIEVE_ORDER_TYPES',",
+          "    'POST /wp-json/kolai/v1/orders': 'CREATE_ORDER',",
+          "    'POST /wp-json/kolai/v1/shipment-options': 'RETRIEVE_SHIPMENT_OPTIONS',",
+          "    'POST /wp-json/kolai/v1/contracts': 'RETRIEVE_CONTRACT',",
+          "    'GET /wp-json/kolai/v1/contracts/clarification-text': 'RETRIEVE_CONTRACT'",
+          "};",
+          "",
+          "// Dynamic scope detection",
+          "let scope = '';",
+          "",
+          "// Product detail",
+          "if (method === 'GET' && uriPath.match(/^\\/wp-json\\/kolai\\/v1\\/products\\/[^/]+$/)) {",
+          "    scope = 'RETRIEVE_PRODUCT';",
+          "}",
+          "",
+          "// Order detail",
+          "else if (method === 'GET' && uriPath.match(/^\\/wp-json\\/kolai\\/v1\\/orders\\/[^/]+$/)) {",
+          "    scope = 'RETRIEVE_ORDER';",
+          "}",
+          "",
+          "// Order update",
+          "else if (method === 'PATCH' && uriPath.match(/^\\/wp-json\\/kolai\\/v1\\/orders\\/[^/]+$/)) {",
+          "    scope = 'UPDATE_ORDER_STATUS';",
+          "}",
+          "",
+          "// Static routes",
+          "else {",
+          "    const matchedKey = Object.keys(scopeMap).find(key => {",
+          "        const [m, path] = key.split(' ');",
+          "        return method === m && uriPath.startsWith(path);",
+          "    });",
+          "",
+          "    if (matchedKey) {",
+          "        scope = scopeMap[matchedKey];",
+          "    }",
+          "}",
+          "",
+          "// Signature input",
+          "const signatureInput = salt + scope + uriPath + requestBody;",
+          "",
+          "// HMAC SHA256",
+          "const signature = CryptoJS.HmacSHA256(",
+          "    signatureInput,",
+          "    secretKey",
+          ").toString(CryptoJS.enc.Hex);",
+          "",
+          "// Auth payload",
+          "const authString =",
+          "    `clientId:${apiKey}` +",
+          "    `&salt:${salt}` +",
+          "    `&scope:${scope}` +",
+          "    `&signature:${signature}`;",
+          "",
+          "// Base64",
+          "const base64Payload = CryptoJS.enc.Base64.stringify(",
+          "    CryptoJS.enc.Utf8.parse(authString)",
+          ");",
+          "",
+          "// Set Authorization header",
+          "pm.request.headers.upsert({",
+          "    key: 'Authorization',",
+          "    value: `IYZ-TP-v2 ${base64Payload}`",
+          "});",
+          "",
+          "// Debug logs",
+          "console.log('Method:', method);",
+          "console.log('URI Path:', uriPath);",
+          "console.log('Scope:', scope);",
+          "console.log('Body:', requestBody);",
+          "console.log('Signature Input:', signatureInput);",
+          "console.log('Signature:', signature);",
+          "console.log('Authorization:', `IYZ-TP-v2 ${base64Payload}`);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
