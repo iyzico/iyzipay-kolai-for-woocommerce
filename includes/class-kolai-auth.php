@@ -28,6 +28,8 @@ class Kolai_Auth {
     const SCOPE_RETRIEVE_ORDER               = 'RETRIEVE_ORDER';
     const SCOPE_RETRIEVE_ORDER_TYPES         = 'RETRIEVE_ORDER_TYPES';
     const SCOPE_RETRIEVE_CONTRACT            = 'RETRIEVE_CONTRACT';
+    const SCOPE_RETRIEVE_REVIEWS             = 'RETRIEVE_REVIEWS';
+    const SCOPE_RETRIEVE_REVIEW              = 'RETRIEVE_REVIEW';
 
     /**
      * Authorization header prefix.

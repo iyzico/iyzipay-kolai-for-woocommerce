@@ -3,7 +3,7 @@
  * Plugin Name: Kolai
  * Plugin URI: https://example.com/kolai
  * Description: Kolai API entegrasyonu için ayarlar modülü
- * Version: 1.1.1
+ * Version: 1.2.0
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('KOLAI_VERSION', '1.1.1');
+define('KOLAI_VERSION', '1.2.0');
 define('KOLAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('KOLAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('KOLAI_PLUGIN_BASENAME', plugin_basename(__FILE__));

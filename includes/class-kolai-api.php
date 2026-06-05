@@ -43,7 +43,14 @@ class Kolai_API {
      * @var Kolai_Contract_Routes
      */
     private $contract_routes;
-    
+
+    /**
+     * Review routes instance
+     *
+     * @var Kolai_Review_Routes
+     */
+    private $review_routes;
+
     /**
      * Register REST API routes
      */
@@ -64,12 +71,16 @@ class Kolai_API {
         require_once KOLAI_INCLUDES_DIR . 'order/order-routes.php';
         require_once KOLAI_INCLUDES_DIR . 'contract/contract-service.php';
         require_once KOLAI_INCLUDES_DIR . 'contract/contract-routes.php';
-        
-        // Initialize product routes
+        require_once KOLAI_INCLUDES_DIR . 'review/review-service.php';
+        require_once KOLAI_INCLUDES_DIR . 'review/review-mapper.php';
+        require_once KOLAI_INCLUDES_DIR . 'review/review-routes.php';
+
+        // Initialize routes
         $this->product_routes = new Kolai_Product_Routes();
         $this->shipping_routes = new Kolai_Shipping_Routes();
         $this->order_routes = new Kolai_Order_Routes();
         $this->contract_routes = new Kolai_Contract_Routes();
+        $this->review_routes = new Kolai_Review_Routes();
 
         // Register routes
         add_action('rest_api_init', array($this, 'register_routes'));
@@ -77,7 +88,7 @@ class Kolai_API {
         // Format 401 errors into standard Kolai response envelope
         add_filter('rest_request_after_callbacks', array($this, 'format_auth_error'), 10, 3);
     }
-    
+
     /**
      * Register REST API routes
      */
@@ -86,6 +97,7 @@ class Kolai_API {
         $this->shipping_routes->register_routes();
         $this->order_routes->register_routes();
         $this->contract_routes->register_routes();
+        $this->review_routes->register_routes();
     }
 
     /**

@@ -49,4 +49,10 @@ class Kolai_Constants {
     const ERROR_INVALID_CONTRACT_TYPE    = '5000';
     const ERROR_INVALID_CONTRACT_REQUEST = '5001';
     const ERROR_CONTRACT_NOT_FOUND       = '5002';
+
+    // 6xxx: Review errors
+    const ERROR_INVALID_REVIEW_REQUEST = '6000';
+    const ERROR_REVIEW_NOT_FOUND       = '6001';
+    const ERROR_INVALID_RATING         = '6003';
+    const ERROR_REVIEWS_DISABLED       = '6004';
 }

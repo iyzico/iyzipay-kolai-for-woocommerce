@@ -227,3 +227,39 @@ class Kolai_Contract_Not_Found_Exception extends Kolai_Not_Found_Exception {
         parent::__construct($message, $error_code);
     }
 }
+
+/**
+ * Invalid review request exception.
+ */
+class Kolai_Invalid_Review_Request_Exception extends Kolai_Bad_Request_Exception {
+    public function __construct($message = 'Invalid review request', $error_code = Kolai_Constants::ERROR_INVALID_REVIEW_REQUEST) {
+        parent::__construct($message, $error_code);
+    }
+}
+
+/**
+ * Review not found exception.
+ */
+class Kolai_Review_Not_Found_Exception extends Kolai_Not_Found_Exception {
+    public function __construct($message = 'Review not found', $error_code = Kolai_Constants::ERROR_REVIEW_NOT_FOUND) {
+        parent::__construct($message, $error_code);
+    }
+}
+
+/**
+ * Invalid rating exception.
+ */
+class Kolai_Invalid_Rating_Exception extends Kolai_Bad_Request_Exception {
+    public function __construct($message = 'Invalid rating value', $error_code = Kolai_Constants::ERROR_INVALID_RATING) {
+        parent::__construct($message, $error_code);
+    }
+}
+
+/**
+ * Reviews disabled for product exception.
+ */
+class Kolai_Reviews_Disabled_Exception extends Kolai_Bad_Request_Exception {
+    public function __construct($message = 'Reviews are disabled for this product', $error_code = Kolai_Constants::ERROR_REVIEWS_DISABLED) {
+        parent::__construct($message, $error_code);
+    }
+}

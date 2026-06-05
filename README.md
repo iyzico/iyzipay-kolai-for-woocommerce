@@ -61,6 +61,12 @@ Tum endpoint'ler asagidaki formatta doner:
 - `5001` Invalid contract request
 - `5002` Contract not found
 
+#### 6xxx - Review Errors
+- `6000` Invalid review request
+- `6001` Review not found
+- `6003` Invalid rating
+- `6004` Reviews disabled
+
 ## Endpoints
 
 Detayli istek/yanit ornekleri ve aciklamalar icin ilgili dokümana gidin:
@@ -72,6 +78,7 @@ Detayli istek/yanit ornekleri ve aciklamalar icin ilgili dokümana gidin:
 | **Kargo** | [SHIPPING.md](SHIPPING.md) | `POST /shipment-options` (alias: `POST /shipping-options`) |
 | **Sipariş** | [ORDER.md](ORDER.md)   | `GET /order-types`, `POST /orders`, `GET /orders/{orderId}`, `PATCH /orders/{orderId}` |
 | **Sözleşme** | [CONTRACT.md](CONTRACT.md) | `POST /contracts` ve `GET /contracts/clarification-text` |
+| **Yorum** | [REVIEW.md](REVIEW.md) | `GET /products/{id}/reviews` (sayfalama + status/rating/modified_after filtresi), `GET /reviews/{id}` |
 | **Loglama** | [LOGS.md](LOGS.md) | Yönetici panelinden açılıp kapatılabilen, DB tabanlı yapısal log altyapısı |
 
 ## Yönetim Sayfaları
@@ -121,9 +128,13 @@ kolai/
 │   ├── order/
 │   │   ├── order-routes.php
 │   │   └── order-service.php
-│   └── shipping/
-│       ├── shipping-routes.php
-│       └── shipping-service.php
+│   ├── shipping/
+│   │   ├── shipping-routes.php
+│   │   └── shipping-service.php
+│   └── review/
+│       ├── review-mapper.php
+│       ├── review-routes.php
+│       └── review-service.php
 ├── kolai.php
 ├── README.md
 ├── AUTH.md
@@ -131,10 +142,17 @@ kolai/
 ├── SHIPPING.md
 ├── ORDER.md
 ├── CONTRACT.md
+├── REVIEW.md
 └── LOGS.md
 ```
 
 ## Sürüm Notları
+
+### 1.2.0
+- **Yorumlar / Değerlendirmeler**: `GET /products/{id}/reviews` (sayfalama + status/rating/modified_after filtresi) ve `GET /reviews/{id}` endpoint'leri eklendi. Default `approved` yorumlar döner. Detay [REVIEW.md](REVIEW.md).
+- Yeni scope'lar: `RETRIEVE_REVIEWS`, `RETRIEVE_REVIEW`.
+- Yeni hata kodları: `6000-6004` (review).
+- PII alanları (author email/IP/agent) yanıttan kasıtlı olarak çıkarıldı.
 
 ### 1.1.1
 - **HTTP/2 fix**: `/products` listesindeki pagination metadatası özel `X-Kolai-*` response header'larından response body'ye (`pagination` alanı) taşındı. Bazı proxy yığınları (Cloudflare strict, HTTP/2) custom header'ları "Header field must only have a single value" protocol error'u ile reddediyordu.
