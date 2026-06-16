@@ -67,7 +67,17 @@ class Kolai_Product_Mapper {
         if (isset($product_data['sale_price']) && $product_data['sale_price']) {
             $mapped['salePrice'] = (string) number_format(floatval($product_data['sale_price']), 2, '.', '');
         }
-        
+
+        // Tax breakdown. price/salePrice above are already tax-inclusive when
+        // the product is taxable; these fields describe the tax component.
+        $mapped['includedTax'] = isset($product_data['included_tax']) ? (bool) $product_data['included_tax'] : false;
+        if (isset($product_data['tax_price'])) {
+            $mapped['taxPrice'] = (string) number_format(floatval($product_data['tax_price']), 2, '.', '');
+        }
+        if (isset($product_data['tax_percentage'])) {
+            $mapped['taxPercentage'] = floatval($product_data['tax_percentage']);
+        }
+
         // Sale Price Effective Date (combine from and to dates)
         if (isset($product_data['date_on_sale_from']) && isset($product_data['date_on_sale_to']) 
             && $product_data['date_on_sale_from'] && $product_data['date_on_sale_to']) {
@@ -142,7 +152,16 @@ class Kolai_Product_Mapper {
             if (isset($variation['sale_price']) && $variation['sale_price']) {
                 $mapped['salePrice'] = (string) number_format(floatval($variation['sale_price']), 2, '.', '');
             }
-            
+
+            // Tax breakdown (price/salePrice already tax-inclusive when taxable).
+            $mapped['includedTax'] = isset($variation['included_tax']) ? (bool) $variation['included_tax'] : false;
+            if (isset($variation['tax_price'])) {
+                $mapped['taxPrice'] = (string) number_format(floatval($variation['tax_price']), 2, '.', '');
+            }
+            if (isset($variation['tax_percentage'])) {
+                $mapped['taxPercentage'] = floatval($variation['tax_percentage']);
+            }
+
             // Stock information
             if (isset($variation['in_stock'])) $mapped['inStock'] = (bool) $variation['in_stock'];
             

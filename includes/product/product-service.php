@@ -330,7 +330,7 @@ class Kolai_Product_Service {
     private function format_product_summary($product) {
         $product_id = $product->get_id();
 
-        return array(
+        $summary = array(
             'id'                => $product_id,
             'name'              => $product->get_name(),
             'slug'              => $product->get_slug(),
@@ -366,6 +366,14 @@ class Kolai_Product_Service {
             // Main image only (gallery omitted from list)
             'image'             => $this->get_product_image($product),
         );
+
+        // Override price/sale_price with tax-inclusive values and append the
+        // included_tax / tax_price / tax_percentage breakdown.
+        return array_merge($summary, $this->calculate_tax_fields(
+            $product,
+            $summary['price'],
+            $summary['sale_price']
+        ));
     }
 
     /**
@@ -457,12 +465,84 @@ class Kolai_Product_Service {
             'review_count' => $product->get_review_count(),
         );
 
+        // Override price/sale_price with tax-inclusive values and append the
+        // included_tax / tax_price / tax_percentage breakdown.
+        $data = array_merge($data, $this->calculate_tax_fields(
+            $product,
+            $data['price'],
+            $data['sale_price']
+        ));
+
         // Get variations if product is variable
         if ($product->is_type('variable')) {
             $data['variations'] = $this->get_product_variations($product);
         }
 
         return $data;
+    }
+
+    /**
+     * Compute tax-inclusive prices and the tax breakdown for a product or
+     * variation.
+     *
+     * Uses WooCommerce's native wc_get_price_including_tax/excluding_tax so the
+     * store's "prices include tax" setting and the configured tax rates are
+     * honoured. In a REST context WC()->customer may be null; WooCommerce then
+     * falls back to the shop base location, so this is safe outside the cart.
+     *
+     * Returns the tax-inclusive `price` and `sale_price` (overriding the raw
+     * net values) plus:
+     *   - included_tax    bool   whether the product is taxable
+     *   - tax_price       float  tax amount on the EFFECTIVE price
+     *                            (sale price when on sale, otherwise price)
+     *   - tax_percentage  float  effective tax rate (%) derived from that amount
+     *
+     * @param WC_Product $product
+     * @param float      $price      Raw regular/active price (get_price()).
+     * @param float|null $sale_price Raw sale price, or null when not on sale.
+     * @return array{included_tax:bool, price:float, sale_price:float|null, tax_price:float, tax_percentage:float}
+     */
+    private function calculate_tax_fields($product, $price, $sale_price) {
+        if (!$product->is_taxable()) {
+            return array(
+                'included_tax'   => false,
+                'price'          => $price,
+                'sale_price'     => $sale_price,
+                'tax_price'      => 0.0,
+                'tax_percentage' => 0.0,
+            );
+        }
+
+        // Tax-inclusive / -exclusive values for the regular price.
+        $price_incl = (float) wc_get_price_including_tax($product, array('price' => $price));
+        $price_excl = (float) wc_get_price_excluding_tax($product, array('price' => $price));
+
+        $sale_incl = null;
+        if ($sale_price !== null) {
+            $sale_incl = (float) wc_get_price_including_tax($product, array('price' => $sale_price));
+        }
+
+        // Effective price = sale price when on sale, otherwise the regular price.
+        if ($sale_price !== null) {
+            $effective_excl = (float) wc_get_price_excluding_tax($product, array('price' => $sale_price));
+            $effective_incl = $sale_incl;
+        } else {
+            $effective_excl = $price_excl;
+            $effective_incl = $price_incl;
+        }
+
+        $tax_price      = round($effective_incl - $effective_excl, 2);
+        $tax_percentage = $effective_excl > 0
+            ? round(($tax_price / $effective_excl) * 100, 2)
+            : 0.0;
+
+        return array(
+            'included_tax'   => true,
+            'price'          => $price_incl,
+            'sale_price'     => $sale_incl,
+            'tax_price'      => $tax_price,
+            'tax_percentage' => $tax_percentage,
+        );
     }
 
     /**
@@ -539,7 +619,7 @@ class Kolai_Product_Service {
                 continue;
             }
 
-            $variations[] = array(
+            $variation_data = array(
                 'id' => $variation->get_id(),
                 'sku' => $variation->get_sku(),
                 'description' => $variation->get_description(),
@@ -551,6 +631,14 @@ class Kolai_Product_Service {
                 'attributes' => $this->get_variation_attributes($variation),
                 'image' => $this->get_product_image($variation),
             );
+
+            // Override price/sale_price with tax-inclusive values and append the
+            // included_tax / tax_price / tax_percentage breakdown.
+            $variations[] = array_merge($variation_data, $this->calculate_tax_fields(
+                $variation,
+                $variation_data['price'],
+                $variation_data['sale_price']
+            ));
         }
 
         if ($truncated) {

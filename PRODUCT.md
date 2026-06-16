@@ -14,6 +14,25 @@ Genel response formatı ve hata kodları için [README.md](README.md) dosyasına
 
 ---
 
+## Vergi Alanları (Tax)
+
+Tüm ürün/varyasyon yanıtlarında fiyatlar **vergi dahil** döner ve vergi kırılımı ayrı alanlarla verilir. Hesaplama WooCommerce'in kendi `wc_get_price_including_tax()` / `wc_get_price_excluding_tax()` fonksiyonlarıyla yapılır; bu sayede mağazanın **"Fiyatlara KDV dahil"** ayarı ve tanımlı vergi oranları olduğu gibi dikkate alınır.
+
+| Alan | Tip | Açıklama |
+|---|---|---|
+| `price` | string | Vergi **dahil** normal fiyat |
+| `salePrice` | string | Vergi **dahil** indirimli fiyat (yalnızca indirim varken döner) |
+| `includedTax` | bool | Ürün vergilendirilebilir (`tax_status = taxable` ve vergi açık) ise `true` |
+| `taxPrice` | string | **Efektif fiyat** üzerindeki vergi tutarı (indirim varsa `salePrice`, yoksa `price`) |
+| `taxPercentage` | number | Efektif vergi oranı (%); `taxPrice / net_efektif_fiyat` üzerinden türetilir |
+
+> **Notlar**
+> - Ürün **vergilendirilemez** ise: `includedTax = false`, `taxPrice = "0.00"`, `taxPercentage = 0` döner ve `price`/`salePrice` net değerleriyle kalır.
+> - `taxPrice` her zaman müşterinin ödediği **efektif** fiyatın (indirim varsa indirimli) vergisidir; `price` ve `salePrice` için ayrı vergi tutarı dönmez.
+> - Net (vergi hariç) değer gerekirse `salePrice - taxPrice` (veya indirim yokken `price - taxPrice`) ile hesaplanabilir.
+
+---
+
 ## GET /products
 
 Ürünleri **sayfalanmış** olarak listeler. Büyük katalog için tek istekte tüm ürünleri çekmeye çalışmayın — endpoint zorunlu olarak sayfalama uygular.
@@ -46,6 +65,7 @@ Mapper aracılığıyla aşağıdaki alanlar (mevcutsa) döner:
 
 ```
 id, title, link, imageLink, inStock, currency, price, salePrice,
+includedTax, taxPrice, taxPercentage,
 salePriceEffectiveDate, productType, gtin, mpn, itemGroupId,
 productLength, productWidth, productHeight, productWeight
 ```
@@ -85,8 +105,11 @@ GET /wp-json/kolai/v1/products?modified_after=2026-05-05T00:00:00Z
       "imageLink": "https://.../t-shirt.jpg",
       "inStock": true,
       "currency": "TRY",
-      "price": "100.00",
-      "salePrice": "89.00",
+      "price": "120.00",
+      "salePrice": "106.80",
+      "includedTax": true,
+      "taxPrice": "17.80",
+      "taxPercentage": 20,
       "productType": "simple",
       "gtin": "TS-001",
       "mpn": "TS-001",
@@ -158,8 +181,11 @@ GET /wp-json/kolai/v1/products/12
     "additionalImageLinks": ["https://.../1.jpg", "https://.../2.jpg"],
     "inStock": true,
     "currency": "TRY",
-    "price": "100.00",
-    "salePrice": "89.00",
+    "price": "120.00",
+    "salePrice": "106.80",
+    "includedTax": true,
+    "taxPrice": "17.80",
+    "taxPercentage": 20,
     "salePriceEffectiveDate": "2026-05-01T00:00:00+00:00/2026-05-31T23:59:59+00:00",
     "productType": "variable",
     "gtin": "TS-001",
@@ -184,8 +210,11 @@ GET /wp-json/kolai/v1/products/12
         "id": 101,
         "sku": "TS-001-RED-M",
         "description": "Kirmizi / M beden",
-        "price": "100.00",
-        "salePrice": "89.00",
+        "price": "120.00",
+        "salePrice": "106.80",
+        "includedTax": true,
+        "taxPrice": "17.80",
+        "taxPercentage": 20,
         "inStock": true,
         "attributes": [
           { "id": 11, "name": "Renk", "slug": "pa_color", "value": "Kirmizi" },
