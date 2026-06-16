@@ -114,6 +114,71 @@ class Kolai_Settings {
             array('label_for' => 'kolai_clarification_text_page_id')
         );
 
+        // iyzico refund/cancel credentials
+        register_setting(
+            'kolai_settings_group',
+            'kolai_iyzico_api_key',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_settings_group',
+            'kolai_iyzico_secret_key',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
+        );
+
+        register_setting(
+            'kolai_settings_group',
+            'kolai_iyzico_environment',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => array($this, 'sanitize_iyzico_environment'),
+                'default' => 'sandbox'
+            )
+        );
+
+        add_settings_section(
+            'kolai_iyzico_section',
+            __('iyzico Iade / Iptal Ayarlari', 'kolai'),
+            array($this, 'render_iyzico_section_callback'),
+            'kolai-settings'
+        );
+
+        add_settings_field(
+            'kolai_iyzico_api_key',
+            __('iyzico API Key', 'kolai'),
+            array($this, 'render_iyzico_api_key_field'),
+            'kolai-settings',
+            'kolai_iyzico_section',
+            array('label_for' => 'kolai_iyzico_api_key')
+        );
+
+        add_settings_field(
+            'kolai_iyzico_secret_key',
+            __('iyzico Secret Key', 'kolai'),
+            array($this, 'render_iyzico_secret_key_field'),
+            'kolai-settings',
+            'kolai_iyzico_section',
+            array('label_for' => 'kolai_iyzico_secret_key')
+        );
+
+        add_settings_field(
+            'kolai_iyzico_environment',
+            __('iyzico Ortam', 'kolai'),
+            array($this, 'render_iyzico_environment_field'),
+            'kolai-settings',
+            'kolai_iyzico_section',
+            array('label_for' => 'kolai_iyzico_environment')
+        );
+
         // Seller info settings
         register_setting(
             'kolai_contracts_group',
@@ -293,10 +358,73 @@ class Kolai_Settings {
     }
     
     /**
+     * Sanitize the iyzico environment — must be sandbox or production.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function sanitize_iyzico_environment($value) {
+        return ($value === 'production') ? 'production' : 'sandbox';
+    }
+
+    /**
      * Render the section description
      */
     public function render_section_callback() {
         echo '<p>' . __('Kolai API entegrasyonu için gerekli bilgileri girin.', 'kolai') . '</p>';
+    }
+
+    /**
+     * Render the iyzico section description
+     */
+    public function render_iyzico_section_callback() {
+        echo '<p>' . esc_html__('Siparis iade ve iptal islemlerinin iyzico\'ya iletilmesi icin iyzico API bilgilerinizi girin.', 'kolai') . '</p>';
+    }
+
+    /**
+     * Render iyzico API Key field
+     */
+    public function render_iyzico_api_key_field() {
+        $api_key = get_option('kolai_iyzico_api_key', '');
+        ?>
+        <input type="text"
+               name="kolai_iyzico_api_key"
+               id="kolai_iyzico_api_key"
+               value="<?php echo esc_attr($api_key); ?>"
+               class="regular-text"
+               placeholder="<?php esc_attr_e('iyzico API Key girin', 'kolai'); ?>" />
+        <p class="description"><?php esc_html_e('iyzico API Key\'inizi buraya girin.', 'kolai'); ?></p>
+        <?php
+    }
+
+    /**
+     * Render iyzico Secret Key field
+     */
+    public function render_iyzico_secret_key_field() {
+        $secret_key = get_option('kolai_iyzico_secret_key', '');
+        ?>
+        <input type="password"
+               name="kolai_iyzico_secret_key"
+               id="kolai_iyzico_secret_key"
+               value="<?php echo esc_attr($secret_key); ?>"
+               class="regular-text"
+               placeholder="<?php esc_attr_e('iyzico Secret Key girin', 'kolai'); ?>" />
+        <p class="description"><?php esc_html_e('iyzico Secret Key\'inizi buraya girin.', 'kolai'); ?></p>
+        <?php
+    }
+
+    /**
+     * Render iyzico environment selector
+     */
+    public function render_iyzico_environment_field() {
+        $environment = get_option('kolai_iyzico_environment', 'sandbox');
+        ?>
+        <select name="kolai_iyzico_environment" id="kolai_iyzico_environment">
+            <option value="sandbox" <?php selected($environment, 'sandbox'); ?>><?php esc_html_e('Sandbox (Test)', 'kolai'); ?></option>
+            <option value="production" <?php selected($environment, 'production'); ?>><?php esc_html_e('Production (Canli)', 'kolai'); ?></option>
+        </select>
+        <p class="description"><?php esc_html_e('Test icin Sandbox, canli islemler icin Production secin.', 'kolai'); ?></p>
+        <?php
     }
     
     /**

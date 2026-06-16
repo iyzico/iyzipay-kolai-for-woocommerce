@@ -104,6 +104,8 @@ class Kolai_Core {
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-loader.php';
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-logger.php';
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-api.php';
+        require_once KOLAI_INCLUDES_DIR . 'payment/class-kolai-iyzico-client.php';
+        require_once KOLAI_INCLUDES_DIR . 'payment/class-kolai-refund-service.php';
         require_once KOLAI_ADMIN_DIR . 'class-kolai-admin.php';
         require_once KOLAI_ADMIN_DIR . 'class-kolai-settings.php';
 
@@ -111,6 +113,9 @@ class Kolai_Core {
 
         // Initialize REST API
         new Kolai_API();
+
+        // iyzico refund (via gateway) and cancel (via status hook) integration.
+        $this->define_payment_hooks();
 
         // Daily cron handler for log retention cleanup
         add_action(Kolai_Logger::CRON_HOOK, array('Kolai_Logger', 'cleanup'));
@@ -120,6 +125,43 @@ class Kolai_Core {
         // plugin was updated via FTP/Git pull without a deactivate/reactivate
         // cycle, which would otherwise leave the logs table missing.
         $this->maybe_run_migrations();
+    }
+
+    /**
+     * Register iyzico refund/cancel integration hooks.
+     *
+     * Refunds are handled through a WooCommerce payment gateway (so the native
+     * "Refund" button works and errors surface in admin); cancellations are
+     * handled on the order status transition to "cancelled".
+     */
+    private function define_payment_hooks() {
+        add_filter('woocommerce_payment_gateways', array($this, 'register_iyzico_gateway'));
+        add_action('woocommerce_order_status_cancelled', array($this, 'handle_order_cancelled'), 10, 2);
+    }
+
+    /**
+     * Register the iyzico refund gateway with WooCommerce.
+     *
+     * @param array $gateways
+     * @return array
+     */
+    public function register_iyzico_gateway($gateways) {
+        // WC_Payment_Gateway is guaranteed loaded by the time this filter runs.
+        require_once KOLAI_INCLUDES_DIR . 'payment/class-kolai-iyzico-gateway.php';
+        $gateways[] = 'Kolai_Iyzico_Gateway';
+        return $gateways;
+    }
+
+    /**
+     * Propagate a WooCommerce order cancellation to iyzico.
+     *
+     * @param int           $order_id
+     * @param WC_Order|null $order
+     * @return void
+     */
+    public function handle_order_cancelled($order_id, $order = null) {
+        $service = new Kolai_Refund_Service();
+        $service->on_order_cancelled($order_id, $order);
     }
 
     /**

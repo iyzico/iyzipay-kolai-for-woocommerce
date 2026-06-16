@@ -79,13 +79,14 @@ Detayli istek/yanit ornekleri ve aciklamalar icin ilgili dokümana gidin:
 | **Sipariş** | [ORDER.md](ORDER.md)   | `GET /order-types`, `POST /orders`, `GET /orders/{orderId}`, `PATCH /orders/{orderId}` |
 | **Sözleşme** | [CONTRACT.md](CONTRACT.md) | `POST /contracts` ve `GET /contracts/clarification-text` |
 | **Yorum** | [REVIEW.md](REVIEW.md) | `GET /products/{id}/reviews` (sayfalama + status/rating/modified_after filtresi), `GET /reviews/{id}` |
+| **İade / İptal** | [REFUND.md](REFUND.md) | WooCommerce iade/iptal işlemlerinin iyzico'ya otomatik iletilmesi (iyzipay-php) |
 | **Loglama** | [LOGS.md](LOGS.md) | Yönetici panelinden açılıp kapatılabilen, DB tabanlı yapısal log altyapısı |
 
 ## Yönetim Sayfaları
 
 | Sayfa | Yol | İçerik |
 |---|---|---|
-| Ayarlar | WP Admin → Kolai | API Key / Secret Key, Aydinlatma Metni sayfası |
+| Ayarlar | WP Admin → Kolai | API Key / Secret Key, Aydinlatma Metni sayfası, iyzico iade/iptal API bilgileri (key/secret/ortam) |
 | Sözleşmeler | WP Admin → Kolai → Sozlesmeler | Satıcı bilgileri, mesafeli satış / ön bilgilendirme metinleri |
 | Loglar | WP Admin → Kolai → Loglar | Log tutma anahtarı, seviye, retention; canlı log tablosu (filtre + temizle) — bkz. [LOGS.md](LOGS.md) |
 
@@ -128,13 +129,19 @@ kolai/
 │   ├── order/
 │   │   ├── order-routes.php
 │   │   └── order-service.php
+│   ├── payment/
+│   │   ├── class-kolai-iyzico-client.php
+│   │   ├── class-kolai-iyzico-gateway.php
+│   │   └── class-kolai-refund-service.php
 │   ├── shipping/
 │   │   ├── shipping-routes.php
 │   │   └── shipping-service.php
-│   └── review/
-│       ├── review-mapper.php
-│       ├── review-routes.php
-│       └── review-service.php
+│   ├── review/
+│   │   ├── review-mapper.php
+│   │   ├── review-routes.php
+│   │   └── review-service.php
+│   └── vendor/
+│       └── iyzipay-php/        # bundled iyzico PHP SDK
 ├── kolai.php
 ├── README.md
 ├── AUTH.md
@@ -143,10 +150,20 @@ kolai/
 ├── ORDER.md
 ├── CONTRACT.md
 ├── REVIEW.md
+├── REFUND.md
 └── LOGS.md
 ```
 
 ## Sürüm Notları
+
+### 1.4.0
+- **iyzico İade / İptal entegrasyonu**: WooCommerce yönetici panelinden yapılan iade ve iptal işlemleri otomatik olarak iyzico'ya iletilir. Detay [REFUND.md](REFUND.md).
+- iyzipay-php SDK `includes/vendor/iyzipay-php/` altında bundle edildi.
+- İade, `kolai-app` ödeme geçidi üzerinden native "İade et" butonu ile çalışır (`process_refund`); tutar kayıtlı `itemTransactions` kalemlerine dağıtılır. İptal, `woocommerce_order_status_cancelled` hook'u ile `paymentId` üzerinden yapılır.
+- Ayarlara iyzico API Key / Secret Key / Ortam (sandbox-production) alanları eklendi.
+
+### 1.3.0
+- **PATCH /orders/{orderId}** artık opsiyonel `paymentId` ve `itemTransactions` alanlarını sipariş meta'sı olarak kaydeder (`kolai_payment_id`, `kolai_item_transactions`). Detay [ORDER.md](ORDER.md).
 
 ### 1.2.0
 - **Yorumlar / Değerlendirmeler**: `GET /products/{id}/reviews` (sayfalama + status/rating/modified_after filtresi) ve `GET /reviews/{id}` endpoint'leri eklendi. Default `approved` yorumlar döner. Detay [REVIEW.md](REVIEW.md).
