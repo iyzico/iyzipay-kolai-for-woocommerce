@@ -247,6 +247,28 @@ PATCH /wp-json/kolai/v1/orders/{orderId}
 
 Not: `orderStatus` alaninin degeri, `/wp-json/kolai/v1/order-types` endpoint'inden donen status anahtarlarindan biri olmalidir (ornegin `pending`, `processing`, `completed`, `cancelled`).
 
+Opsiyonel olarak odeme bilgileri de gonderilebilir. Gonderildiginde bu alanlar siparise **order meta** olarak kaydedilir:
+
+```json
+{
+  "orderStatus": "processing",
+  "paymentId": "123456789",
+  "itemTransactions": [
+    {
+      "itemId": "7ab0ee59-18b4-4e30-9ca8-04197bb34127",
+      "paymentTransactionId": "34426266",
+      "transactionStatus": 2,
+      "price": 10.00,
+      "paidPrice": 10.00
+    }
+  ]
+}
+```
+
+Not: Odeme alanlari opsiyoneldir ve `orderStatus` ile birlikte gonderilebilir.
+- `paymentId`: `kolai_payment_id` order meta'sina kaydedilir.
+- `itemTransactions`: normalize edilerek JSON olarak `kolai_item_transactions` order meta'sina kaydedilir. Her bir kalem `itemId`, `paymentTransactionId`, `transactionStatus`, `price`, `paidPrice` alanlarini icerir.
+
 ### Response (success)
 
 ```json

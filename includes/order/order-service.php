@@ -195,8 +195,48 @@ class Kolai_Order_Service {
             throw new Kolai_Invalid_Order_Request_Exception('Invalid orderStatus: ' . $new_status);
         }
         $order->set_status($new_status);
+        $this->apply_payment_meta($order, $payload);
         $order->save();
         return $this->format_order_response($order);
+    }
+
+    /**
+     * Persist payment fields (paymentId, itemTransactions) as order meta.
+     *
+     * @param WC_Order $order
+     * @param array    $payload
+     * @return void
+     */
+    private function apply_payment_meta($order, $payload) {
+        if (!is_array($payload)) {
+            return;
+        }
+
+        if (isset($payload['paymentId'])) {
+            $payment_id = trim((string) $payload['paymentId']);
+            if ($payment_id !== '') {
+                $order->update_meta_data('kolai_payment_id', sanitize_text_field($payment_id));
+            }
+        }
+
+        if (isset($payload['itemTransactions']) && is_array($payload['itemTransactions'])) {
+            $transactions = array();
+            foreach ($payload['itemTransactions'] as $transaction) {
+                if (!is_array($transaction)) {
+                    continue;
+                }
+                $transactions[] = array(
+                    'itemId'                => isset($transaction['itemId']) ? sanitize_text_field(trim((string) $transaction['itemId'])) : '',
+                    'paymentTransactionId'  => isset($transaction['paymentTransactionId']) ? sanitize_text_field(trim((string) $transaction['paymentTransactionId'])) : '',
+                    'transactionStatus'     => isset($transaction['transactionStatus']) ? (int) $transaction['transactionStatus'] : null,
+                    'price'                 => isset($transaction['price']) ? (float) $transaction['price'] : null,
+                    'paidPrice'             => isset($transaction['paidPrice']) ? (float) $transaction['paidPrice'] : null,
+                );
+            }
+            if (!empty($transactions)) {
+                $order->update_meta_data('kolai_item_transactions', wp_json_encode($transactions));
+            }
+        }
     }
 
     /**
