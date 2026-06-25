@@ -165,7 +165,7 @@ class Kolai_Refund_Service {
             return new WP_Error('kolai_cancel_error', __('iyzico API anahtarlari ayarlanmamis.', 'kolai'));
         }
 
-        $payment_id = trim((string) $order->get_meta(self::META_PAYMENT_ID));
+        $payment_id = trim((string) $order->get_meta(Kolai_Meta_Keys::get('payment_id')));
         if ($payment_id === '') {
             return new WP_Error('kolai_cancel_error', __('Bu siparis icin iyzico paymentId bulunamadi.', 'kolai'));
         }
@@ -173,7 +173,7 @@ class Kolai_Refund_Service {
         $conversation_id = 'order-' . $order->get_id() . '-cancel';
         $result = $this->client->cancel($payment_id, $conversation_id);
 
-        $order->update_meta_data(self::META_CANCEL_RESULT, wp_json_encode(array(
+        $order->update_meta_data(Kolai_Meta_Keys::get('cancel_result'), wp_json_encode(array(
             'success'      => !empty($result['success']),
             'errorCode'    => isset($result['errorCode']) ? $result['errorCode'] : null,
             'errorMessage' => isset($result['errorMessage']) ? $result['errorMessage'] : null,
@@ -219,7 +219,7 @@ class Kolai_Refund_Service {
         }
 
         // Idempotency: skip if iyzico already reported a successful cancel.
-        $existing = $order->get_meta(self::META_CANCEL_RESULT);
+        $existing = $order->get_meta(Kolai_Meta_Keys::get('cancel_result'));
         if ($existing) {
             $decoded = json_decode($existing, true);
             if (is_array($decoded) && !empty($decoded['success'])) {
@@ -245,7 +245,7 @@ class Kolai_Refund_Service {
      * @return array
      */
     private function get_item_transactions($order) {
-        $raw = $order->get_meta(self::META_ITEM_TRANSACTIONS);
+        $raw = $order->get_meta(Kolai_Meta_Keys::get('item_transactions'));
         if (empty($raw)) {
             return array();
         }
@@ -260,7 +260,7 @@ class Kolai_Refund_Service {
      * @return array<string,float>
      */
     private function get_refunded_map($order) {
-        $raw = $order->get_meta(self::META_REFUNDED_TRANSACTIONS);
+        $raw = $order->get_meta(Kolai_Meta_Keys::get('refunded_transactions'));
         if (empty($raw)) {
             return array();
         }
@@ -276,7 +276,7 @@ class Kolai_Refund_Service {
      * @return void
      */
     private function save_refunded_map($order, $map) {
-        $order->update_meta_data(self::META_REFUNDED_TRANSACTIONS, wp_json_encode($map));
+        $order->update_meta_data(Kolai_Meta_Keys::get('refunded_transactions'), wp_json_encode($map));
         $order->save();
     }
 

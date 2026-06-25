@@ -52,12 +52,42 @@ class Kolai_Admin {
         // Reset cached settings whenever the logging options are saved.
         add_action('update_option_' . Kolai_Logger::OPTION_ENABLED, array('Kolai_Logger', 'reset_cache'));
         add_action('update_option_' . Kolai_Logger::OPTION_LEVEL,   array('Kolai_Logger', 'reset_cache'));
+
+        // Add a "Settings" shortcut on the Plugins list row.
+        add_filter('plugin_action_links_' . KOLAI_PLUGIN_BASENAME, array($this, 'add_action_links'));
+    }
+
+    /**
+     * Whether the current admin screen belongs to this plugin (all Kolai page
+     * slugs contain "kolai"), so assets load only where they are needed.
+     *
+     * @param string $hook Current admin page hook suffix.
+     * @return bool
+     */
+    private function is_kolai_screen($hook) {
+        return is_string($hook) && strpos($hook, 'kolai') !== false;
+    }
+
+    /**
+     * Add a "Settings" action link to the plugin row.
+     *
+     * @param array $links
+     * @return array
+     */
+    public function add_action_links($links) {
+        $settings_link = '<a href="' . esc_url(admin_url('admin.php?page=kolai-settings')) . '">'
+            . esc_html__('Ayarlar', 'kolai') . '</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 
     /**
      * Register the stylesheets for the admin area
      */
     public function enqueue_styles($hook) {
+        if (!$this->is_kolai_screen($hook)) {
+            return;
+        }
         wp_enqueue_style(
             $this->plugin_name,
             KOLAI_PLUGIN_URL . 'admin/css/kolai-admin.css',
@@ -71,6 +101,9 @@ class Kolai_Admin {
      * Register the JavaScript for the admin area
      */
     public function enqueue_scripts($hook) {
+        if (!$this->is_kolai_screen($hook)) {
+            return;
+        }
         wp_enqueue_script(
             $this->plugin_name,
             KOLAI_PLUGIN_URL . 'admin/js/kolai-admin.js',
@@ -131,6 +164,15 @@ class Kolai_Admin {
 
         add_submenu_page(
             'kolai-settings',
+            __('Meta Alan Eslesme', 'kolai'),
+            __('Meta Eslesme', 'kolai'),
+            'manage_options',
+            'kolai-meta-map',
+            array($this, 'display_meta_map_page')
+        );
+
+        add_submenu_page(
+            'kolai-settings',
             __('Loglar', 'kolai'),
             __('Loglar', 'kolai'),
             'manage_options',
@@ -151,6 +193,13 @@ class Kolai_Admin {
      */
     public function display_contracts_page() {
         include_once KOLAI_ADMIN_DIR . 'views/contracts-page.php';
+    }
+
+    /**
+     * Render the meta field mapping page
+     */
+    public function display_meta_map_page() {
+        include_once KOLAI_ADMIN_DIR . 'views/meta-map-page.php';
     }
 
     /**

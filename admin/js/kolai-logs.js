@@ -59,9 +59,9 @@
         }
 
         var html = rows.map(function (row) {
-            var dataPreview = row.data ? '<button type="button" class="button-link kolai-log-toggle">▶ data</button>' : '';
+            var dataPreview = row.data ? '<button type="button" class="button-link kolai-log-toggle" aria-expanded="false">▶ data</button>' : '';
             var dataBlock   = row.data
-                ? '<pre class="kolai-log-data" hidden>' + escapeHtml(formatJson(row.data)) + '</pre>'
+                ? '<pre class="kolai-log-data" hidden aria-hidden="true">' + escapeHtml(formatJson(row.data)) + '</pre>'
                 : '';
             var requestId   = row.request_id ? '<div class="kolai-log-rid">rid: ' + escapeHtml(row.request_id) + '</div>' : '';
             var duration    = row.duration_ms !== null ? escapeHtml(row.duration_ms) + ' ms' : '';
@@ -221,6 +221,8 @@
         }
         var open = !$pre.prop('hidden');
         $pre.prop('hidden', open);
+        $pre.attr('aria-hidden', open ? 'true' : 'false');
+        $btn.attr('aria-expanded', open ? 'false' : 'true');
         $btn.text((open ? '▶' : '▼') + ' data');
     });
 

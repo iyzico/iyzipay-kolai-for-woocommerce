@@ -159,7 +159,7 @@ $contexts       = Kolai_Logger::distinct_contexts();
                 <th style="width: 80px;"><?php esc_html_e('Süre', 'kolai'); ?></th>
             </tr>
         </thead>
-        <tbody id="kolai-logs-tbody">
+        <tbody id="kolai-logs-tbody" aria-live="polite" aria-busy="false">
             <tr>
                 <td colspan="7" class="kolai-logs-loading">
                     <?php esc_html_e('Yükleniyor…', 'kolai'); ?>

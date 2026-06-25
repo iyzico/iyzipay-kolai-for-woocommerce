@@ -146,6 +146,13 @@ class Kolai_Shipping_Service {
      * @return void
      */
     private function prime_customer_context($destination) {
+        // Free Shipping's is_available() accesses WC()->cart unconditionally
+        // (WC_Shipping_Free_Shipping::is_available, lines ~165/178) before the
+        // availability filter runs, so a null cart fatals in this REST context.
+        // Ensure a cart exists first; correctness of the min_amount check is
+        // handled by the filter in get_rates_for_package().
+        $this->ensure_cart();
+
         if (is_null(WC()->customer)) {
             WC()->customer = new WC_Customer(get_current_user_id(), true);
         }
@@ -165,25 +172,77 @@ class Kolai_Shipping_Service {
     }
 
     /**
+     * Ensure WC()->cart is initialized.
+     *
+     * Shipping methods (e.g. Free Shipping with a minimum-amount requirement)
+     * read from WC()->cart during is_available(). In a REST context the cart is
+     * not bootstrapped automatically, so load it once if missing.
+     *
+     * @return void
+     */
+    private function ensure_cart() {
+        if (is_null(WC()->cart) && function_exists('wc_load_cart')) {
+            wc_load_cart();
+        }
+    }
+
+    /**
+     * Evaluate Free Shipping availability from the package instead of the cart.
+     *
+     * The cart we load for the REST request is empty, so WooCommerce's own
+     * min_amount check would always fail. Re-evaluate it against the package
+     * contents. Coupon-based requirements ('coupon', 'both') cannot be assessed
+     * without a cart and are left to WooCommerce's (false) result.
+     *
+     * @param bool              $is_available
+     * @param array             $package
+     * @param WC_Shipping_Method $method
+     * @return bool
+     */
+    public function evaluate_free_shipping_for_package($is_available, $package, $method) {
+        $requires = isset($method->requires) ? $method->requires : '';
+        if (!in_array($requires, array('min_amount', 'either'), true)) {
+            return $is_available;
+        }
+
+        $total = 0.0;
+        if (!empty($package['contents'])) {
+            foreach ($package['contents'] as $item) {
+                $total += isset($item['line_total']) ? (float) $item['line_total'] : 0.0;
+            }
+        }
+
+        // 'min_amount' and 'either' both succeed when the minimum is met; in this
+        // headless context there are no coupons, so 'either' reduces to this.
+        return $total >= (float) $method->min_amount;
+    }
+
+    /**
      * Calculate rates for a package without cart/session dependencies.
      *
      * @param array $package
      * @return array
      */
     private function get_rates_for_package($package) {
-        $zone = WC_Shipping_Zones::get_zone_matching_package($package);
-        $methods = $zone ? $zone->get_shipping_methods(true) : array();
+        add_filter('woocommerce_shipping_free_shipping_is_available', array($this, 'evaluate_free_shipping_for_package'), 10, 3);
 
         $rates = array();
-        foreach ($methods as $method) {
-            if (!$method->enabled) {
-                continue;
-            }
+        try {
+            $zone = WC_Shipping_Zones::get_zone_matching_package($package);
+            $methods = $zone ? $zone->get_shipping_methods(true) : array();
 
-            $method_rates = $method->get_rates_for_package($package);
-            if (!empty($method_rates)) {
-                $rates = $rates + $method_rates;
+            foreach ($methods as $method) {
+                if (!$method->enabled) {
+                    continue;
+                }
+
+                $method_rates = $method->get_rates_for_package($package);
+                if (!empty($method_rates)) {
+                    $rates = $rates + $method_rates;
+                }
             }
+        } finally {
+            remove_filter('woocommerce_shipping_free_shipping_is_available', array($this, 'evaluate_free_shipping_for_package'), 10);
         }
 
         if (empty($rates)) {

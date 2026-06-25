@@ -215,7 +215,7 @@ class Kolai_Order_Service {
         if (isset($payload['paymentId'])) {
             $payment_id = trim((string) $payload['paymentId']);
             if ($payment_id !== '') {
-                $order->update_meta_data('kolai_payment_id', sanitize_text_field($payment_id));
+                $order->update_meta_data(Kolai_Meta_Keys::get('payment_id'), sanitize_text_field($payment_id));
             }
         }
 
@@ -234,7 +234,7 @@ class Kolai_Order_Service {
                 );
             }
             if (!empty($transactions)) {
-                $order->update_meta_data('kolai_item_transactions', wp_json_encode($transactions));
+                $order->update_meta_data(Kolai_Meta_Keys::get('item_transactions'), wp_json_encode($transactions));
             }
         }
     }
@@ -325,21 +325,24 @@ class Kolai_Order_Service {
         if (isset($billing['invoiceType'])) {
             $invoice_type = strtolower(trim((string) $billing['invoiceType']));
             if ($invoice_type !== '') {
-                $order->update_meta_data('billing_invoice_type', $invoice_type);
+                $order->update_meta_data(
+                    Kolai_Meta_Keys::get('invoice_type'),
+                    sanitize_text_field(Kolai_Meta_Keys::invoice_value($invoice_type))
+                );
             }
         }
 
         if (isset($billing['taxId'])) {
             $tax_id = trim((string) $billing['taxId']);
             if ($tax_id !== '') {
-                $order->update_meta_data('billing_tax_id', sanitize_text_field($tax_id));
+                $order->update_meta_data(Kolai_Meta_Keys::get('tax_id'), sanitize_text_field($tax_id));
             }
         }
 
         if (isset($billing['taxOffice'])) {
             $tax_office = trim((string) $billing['taxOffice']);
             if ($tax_office !== '') {
-                $order->update_meta_data('billing_tax_office', sanitize_text_field($tax_office));
+                $order->update_meta_data(Kolai_Meta_Keys::get('tax_office'), sanitize_text_field($tax_office));
             }
         }
     }
@@ -449,14 +452,47 @@ class Kolai_Order_Service {
             throw new Kolai_Discount_Exceeds_Total_Exception();
         }
 
+        // The incoming discountAmount is tax-inclusive (gross). To keep the tax
+        // report consistent under tax-inclusive (KDV) pricing, split the discount
+        // into a net amount plus per-rate negative tax, prorated against the
+        // order's existing tax lines. When the store has no tax, this naturally
+        // degrades to a plain non-taxable negative fee.
+        $order_tax_lines = $order->get_taxes();
+        $ratio = ($total_before > 0) ? ($discount / $total_before) : 0.0;
+
+        $fee_taxes = array();
+        $discount_tax_total = 0.0;
+        foreach ($order_tax_lines as $tax_item) {
+            $rate_id  = $tax_item->get_rate_id();
+            $line_tax = (float) $tax_item->get_tax_total() + (float) $tax_item->get_shipping_tax_total();
+            if ($line_tax === 0.0) {
+                continue;
+            }
+            $alloc = round(-1 * $line_tax * $ratio, 2);
+            $fee_taxes[$rate_id] = $alloc;
+            $discount_tax_total += $alloc;
+        }
+
+        // fee net (excl tax) = -(gross discount - |allocated tax|).
+        // $discount_tax_total is negative, so this subtracts the tax portion.
+        $fee_net = round(-1 * $discount - $discount_tax_total, 2);
+
         $fee = new WC_Order_Item_Fee();
         $fee->set_name('Discount');
-        $fee->set_amount(-$discount);
-        $fee->set_total(-$discount);
-        $fee->set_tax_status('none');
-        $fee->set_taxes(array());
+        $fee->set_amount($fee_net);
+        $fee->set_total($fee_net);
+
+        if (!empty($fee_taxes)) {
+            $fee->set_tax_status('taxable');
+            $fee->set_taxes(array('total' => $fee_taxes));
+        } else {
+            $fee->set_tax_status('none');
+            $fee->set_taxes(array());
+        }
 
         $order->add_item($fee);
-        $order->calculate_totals();
+        // Pass false so calculate_totals does NOT recompute taxes and overwrite
+        // the negative tax we allocated on the discount fee above.
+        $order->calculate_totals(false);
     }
 }

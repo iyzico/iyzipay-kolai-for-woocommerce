@@ -312,6 +312,97 @@ class Kolai_Settings {
                 'default' => 7,
             )
         );
+
+        // Meta field mapping (single array option).
+        register_setting(
+            'kolai_meta_map_group',
+            Kolai_Meta_Keys::OPTION,
+            array(
+                'type' => 'array',
+                'sanitize_callback' => array($this, 'sanitize_meta_field_map'),
+                'default' => array(),
+            )
+        );
+
+        add_settings_section(
+            'kolai_meta_map_section',
+            __('Meta Alan Anahtarlari', 'kolai'),
+            array($this, 'render_meta_map_section_callback'),
+            'kolai-meta-map'
+        );
+
+        $meta_fields = array(
+            'invoice_type'          => __('Fatura Tipi', 'kolai'),
+            'tax_id'                => __('Vergi / TC No', 'kolai'),
+            'tax_office'            => __('Vergi Dairesi', 'kolai'),
+            'payment_id'            => __('iyzico Payment ID', 'kolai'),
+            'item_transactions'     => __('Item Transactions', 'kolai'),
+            'refunded_transactions' => __('Iade Kayitlari', 'kolai'),
+            'cancel_result'         => __('Iptal Sonucu', 'kolai'),
+        );
+        foreach ($meta_fields as $field => $label) {
+            add_settings_field(
+                'kolai_meta_key_' . $field,
+                $label,
+                array($this, 'render_meta_key_field'),
+                'kolai-meta-map',
+                'kolai_meta_map_section',
+                array('field' => $field)
+            );
+        }
+
+        add_settings_section(
+            'kolai_meta_invoice_value_section',
+            __('Fatura Tipi Deger Eslesme', 'kolai'),
+            array($this, 'render_meta_invoice_value_section_callback'),
+            'kolai-meta-map'
+        );
+
+        $invoice_values = array(
+            'personal' => __('"personal" yerine kaydedilecek deger', 'kolai'),
+            'company'  => __('"company" yerine kaydedilecek deger', 'kolai'),
+        );
+        foreach ($invoice_values as $canonical => $label) {
+            add_settings_field(
+                'kolai_invoice_value_' . $canonical,
+                $label,
+                array($this, 'render_invoice_value_field'),
+                'kolai-meta-map',
+                'kolai_meta_invoice_value_section',
+                array('canonical' => $canonical)
+            );
+        }
+    }
+
+    /**
+     * Sanitize the meta field map option.
+     *
+     * @param mixed $input
+     * @return array<string,string>
+     */
+    public function sanitize_meta_field_map($input) {
+        $clean = array();
+        if (!is_array($input)) {
+            return $clean;
+        }
+        foreach (array_keys(Kolai_Meta_Keys::DEFAULTS) as $field) {
+            if (isset($input[$field])) {
+                $key = Kolai_Meta_Keys::sanitize_meta_key($input[$field]);
+                if ($key !== '') {
+                    $clean[$field] = $key;
+                }
+            }
+        }
+        foreach (array('personal', 'company') as $canonical) {
+            $field = 'invoice_value_' . $canonical;
+            if (isset($input[$field])) {
+                $val = sanitize_text_field($input[$field]);
+                if ($val !== '') {
+                    $clean[$field] = $val;
+                }
+            }
+        }
+        return $clean;
     }
 
     /**
@@ -427,6 +518,74 @@ class Kolai_Settings {
         <?php
     }
     
+    /**
+     * Render the meta map section description
+     */
+    public function render_meta_map_section_callback() {
+        echo '<p>' . esc_html__('Siparis verilerinin kaydedilecegi meta anahtar adlarini buradan ozellestirebilirsiniz. Bos birakirsaniz varsayilan anahtarlar kullanilir.', 'kolai') . '</p>';
+        echo '<p><em>' . esc_html__('Not: Anahtar adini degistirmek yalnizca bundan sonra olusturulacak/guncellenecek siparisleri etkiler; mevcut siparislerdeki veriler eski anahtarda kalir.', 'kolai') . '</em></p>';
+    }
+
+    /**
+     * Render the invoice value mapping section description
+     */
+    public function render_meta_invoice_value_section_callback() {
+        echo '<p>' . esc_html__('Fatura tipi degerini diger eklentilerinizin bekledigi degerlerle eslestirin. Bos birakirsaniz "personal" / "company" olarak kaydedilir.', 'kolai') . '</p>';
+    }
+
+    /**
+     * Render a single meta key text field.
+     *
+     * @param array $args
+     */
+    public function render_meta_key_field($args) {
+        $field   = isset($args['field']) ? $args['field'] : '';
+        $default = isset(Kolai_Meta_Keys::DEFAULTS[$field]) ? Kolai_Meta_Keys::DEFAULTS[$field] : '';
+        $map     = get_option(Kolai_Meta_Keys::OPTION, array());
+        $value   = (is_array($map) && isset($map[$field])) ? $map[$field] : '';
+        $name    = Kolai_Meta_Keys::OPTION . '[' . $field . ']';
+        ?>
+        <input type="text"
+               name="<?php echo esc_attr($name); ?>"
+               value="<?php echo esc_attr($value); ?>"
+               class="regular-text"
+               placeholder="<?php echo esc_attr($default); ?>" />
+        <p class="description">
+            <?php
+            /* translators: %s: default meta key */
+            printf(esc_html__('Varsayilan: %s', 'kolai'), '<code>' . esc_html($default) . '</code>');
+            ?>
+        </p>
+        <?php
+    }
+
+    /**
+     * Render a single invoice value mapping field.
+     *
+     * @param array $args
+     */
+    public function render_invoice_value_field($args) {
+        $canonical = isset($args['canonical']) ? $args['canonical'] : '';
+        $field     = 'invoice_value_' . $canonical;
+        $default   = isset(Kolai_Meta_Keys::INVOICE_VALUE_DEFAULTS[$canonical]) ? Kolai_Meta_Keys::INVOICE_VALUE_DEFAULTS[$canonical] : '';
+        $map       = get_option(Kolai_Meta_Keys::OPTION, array());
+        $value     = (is_array($map) && isset($map[$field])) ? $map[$field] : '';
+        $name      = Kolai_Meta_Keys::OPTION . '[' . $field . ']';
+        ?>
+        <input type="text"
+               name="<?php echo esc_attr($name); ?>"
+               value="<?php echo esc_attr($value); ?>"
+               class="regular-text"
+               placeholder="<?php echo esc_attr($default); ?>" />
+        <p class="description">
+            <?php
+            /* translators: %s: default invoice value */
+            printf(esc_html__('Varsayilan: %s', 'kolai'), '<code>' . esc_html($default) . '</code>');
+            ?>
+        </p>
+        <?php
+    }
+
     /**
      * Render API Key field
      */
