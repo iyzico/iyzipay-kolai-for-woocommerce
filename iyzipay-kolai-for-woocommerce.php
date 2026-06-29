@@ -1,16 +1,20 @@
 <?php
 /**
- * Plugin Name: Kolai
- * Plugin URI: https://example.com/kolai
+ * Plugin Name: iyzico Kolai for WooCommerce
+ * Plugin URI: https://github.com/iyzico/iyzipay-kolai-for-woocommerce
  * Description: Kolai API entegrasyonu için ayarlar modülü
- * Version: 1.5.0
- * Author: Your Name
- * Author URI: https://example.com
- * License: GPL v2 or later
+ * Version: 1.6.0
+ * Author: iyzico
+ * Author URI: https://www.iyzico.com
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: kolai
+ * Domain Path: /languages
  * Requires Plugins: woocommerce
  * Requires at least: 5.0
  * Requires PHP: 7.2
+ * WC requires at least: 5.0
+ * WC tested up to: 9.8
  */
 
 // Exit if accessed directly
@@ -19,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('KOLAI_VERSION', '1.5.0');
+define('KOLAI_VERSION', '1.6.0');
 define('KOLAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('KOLAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('KOLAI_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -45,6 +49,23 @@ function deactivate_kolai() {
 
 register_activation_hook(__FILE__, 'activate_kolai');
 register_deactivation_hook(__FILE__, 'deactivate_kolai');
+
+/**
+ * Declare compatibility with WooCommerce features.
+ *
+ * - High-Performance Order Storage (HPOS / custom order tables): the plugin
+ *   uses CRUD APIs (WC_Order getters/setters, wc_get_order) and never queries
+ *   the posts table directly, so it is HPOS-safe.
+ * - Cart/Checkout Blocks: the bundled gateway is hidden from checkout
+ *   (is_available() returns false), so it imposes no requirement on the
+ *   classic-vs-blocks checkout and is compatible with both.
+ */
+add_action('before_woocommerce_init', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+    }
+});
 
 /**
  * Begins execution of the plugin

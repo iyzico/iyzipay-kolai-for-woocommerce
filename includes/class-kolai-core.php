@@ -192,7 +192,10 @@ class Kolai_Core {
      * Define the locale for this plugin for internationalization
      */
     private function set_locale() {
-        add_action('plugins_loaded', array($this, 'load_plugin_textdomain'));
+        // Must run on `init` (not `plugins_loaded`): since WordPress 6.7 calling
+        // load_plugin_textdomain() earlier triggers a "_load_textdomain_just_in_time
+        // was called incorrectly" notice. `init` is the earliest safe hook.
+        add_action('init', array($this, 'load_plugin_textdomain'));
     }
     
     /**

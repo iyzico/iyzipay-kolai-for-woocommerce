@@ -156,7 +156,7 @@ kolai/
 
 ## Sürüm Notları
 
-### 1.5.0
+### 1.6.0
 - **iyzico İade / İptal entegrasyonu**: WooCommerce yönetici panelinden yapılan iade ve iptal işlemleri otomatik olarak iyzico'ya iletilir. Detay [REFUND.md](REFUND.md).
 - iyzipay-php SDK `includes/vendor/iyzipay-php/` altında bundle edildi.
 - İade, `kolai-app` ödeme geçidi üzerinden native "İade et" butonu ile çalışır (`process_refund`); tutar kayıtlı `itemTransactions` kalemlerine dağıtılır. İptal, `woocommerce_order_status_cancelled` hook'u ile `paymentId` üzerinden yapılır.
