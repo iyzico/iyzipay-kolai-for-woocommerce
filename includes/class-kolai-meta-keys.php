@@ -38,6 +38,7 @@ class Kolai_Meta_Keys {
         'payment_id'            => 'kolai_payment_id',
         'item_transactions'     => 'kolai_item_transactions',
         'refunded_transactions' => 'kolai_refunded_transactions',
+        'refund_operations'     => 'kolai_refund_operations',
         'cancel_result'         => 'kolai_iyzico_cancel_result',
     );
 

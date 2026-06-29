@@ -15,7 +15,8 @@
 }
 
 .kolai-settings-page .regular-text {
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
 }
 
 /* ===== Logs page ===== */
@@ -23,7 +24,7 @@
     font-size: 14px;
     color: #646970;
     font-weight: normal;
-    margin-left: 6px;
+    margin-inline-start: 6px;
 }
 
 .kolai-logs-toolbar {
@@ -44,12 +45,17 @@
 }
 
 .kolai-logs-toolbar .button-link-delete {
-    margin-left: auto;
+    margin-inline-start: auto;
     color: #b32d2e;
 }
 
+/* Horizontal scroll wrapper so the 7-column log table never overflows on
+   narrow / mobile viewports. */
 .kolai-logs-table {
     margin-top: 0;
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .kolai-logs-table td,
@@ -139,4 +145,26 @@
     align-items: center;
     gap: 12px;
     margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+/* Visible keyboard focus for custom interactive elements. */
+.kolai-log-toggle:focus-visible,
+.kolai-logs-toolbar .button:focus-visible,
+.kolai-logs-pagination .button:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 1px;
+}
+
+/* Small-screen toolbar: let filters wrap and fill the row, and keep the
+   destructive action from sticking to the far edge. */
+@media (max-width: 782px) {
+    .kolai-logs-toolbar select,
+    .kolai-logs-toolbar input[type="search"] {
+        flex: 1 1 100%;
+    }
+
+    .kolai-logs-toolbar .button-link-delete {
+        margin-inline-start: 0;
+    }
 }

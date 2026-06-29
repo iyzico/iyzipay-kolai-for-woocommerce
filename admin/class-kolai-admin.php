@@ -133,6 +133,11 @@ class Kolai_Admin {
                         'fetchError'   => __('Loglar yüklenirken bir hata oluştu.', 'kolai'),
                         'noLogs'       => __('Kayıt bulunamadı.', 'kolai'),
                         'cleared'      => __('Loglar temizlendi.', 'kolai'),
+                        'loading'      => __('Yükleniyor…', 'kolai'),
+                        'records'      => __('kayıt', 'kolai'),
+                        'autoOff'      => __('Otomatik yenileme: kapalı', 'kolai'),
+                        'autoOn'       => __('Otomatik yenileme: 5 sn', 'kolai'),
+                        'dataLabel'    => __('data', 'kolai'),
                     ),
                 )
             );

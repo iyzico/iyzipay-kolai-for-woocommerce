@@ -113,6 +113,7 @@ $contexts       = Kolai_Logger::distinct_contexts();
     <?php endif; ?>
 
     <div class="kolai-logs-toolbar">
+        <label for="kolai-logs-filter-level" class="screen-reader-text"><?php esc_html_e('Seviyeye göre filtrele', 'kolai'); ?></label>
         <select id="kolai-logs-filter-level">
             <option value=""><?php esc_html_e('Tüm seviyeler', 'kolai'); ?></option>
             <option value="<?php echo esc_attr(Kolai_Logger::LEVEL_DEBUG); ?>">debug</option>
@@ -121,6 +122,7 @@ $contexts       = Kolai_Logger::distinct_contexts();
             <option value="<?php echo esc_attr(Kolai_Logger::LEVEL_ERROR); ?>">error</option>
         </select>
 
+        <label for="kolai-logs-filter-context" class="screen-reader-text"><?php esc_html_e('Bağlama göre filtrele', 'kolai'); ?></label>
         <select id="kolai-logs-filter-context">
             <option value=""><?php esc_html_e('Tüm bağlamlar', 'kolai'); ?></option>
             <?php foreach ($contexts as $ctx) : ?>
@@ -128,17 +130,18 @@ $contexts       = Kolai_Logger::distinct_contexts();
             <?php endforeach; ?>
         </select>
 
+        <label for="kolai-logs-filter-search" class="screen-reader-text"><?php esc_html_e('Loglarda ara', 'kolai'); ?></label>
         <input type="search"
                id="kolai-logs-filter-search"
                placeholder="<?php esc_attr_e('Mesaj/data içinde ara…', 'kolai'); ?>"
                class="regular-text" />
 
         <button type="button" class="button" id="kolai-logs-refresh">
-            <span class="dashicons dashicons-update"></span>
+            <span class="dashicons dashicons-update" aria-hidden="true"></span>
             <?php esc_html_e('Yenile', 'kolai'); ?>
         </button>
 
-        <button type="button" class="button" id="kolai-logs-auto" data-on="0">
+        <button type="button" class="button" id="kolai-logs-auto" data-on="0" aria-pressed="false">
             <?php esc_html_e('Otomatik yenileme: kapalı', 'kolai'); ?>
         </button>
 
@@ -146,6 +149,8 @@ $contexts       = Kolai_Logger::distinct_contexts();
             <?php esc_html_e('Tüm Logları Temizle', 'kolai'); ?>
         </button>
     </div>
+
+    <p id="kolai-logs-status" class="screen-reader-text" role="status" aria-live="polite"></p>
 
     <table class="widefat striped kolai-logs-table">
         <thead>

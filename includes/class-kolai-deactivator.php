@@ -17,9 +17,10 @@ if (!defined('ABSPATH')) {
 class Kolai_Deactivator {
     
     /**
-     * Short Description. (use period)
+     * Unschedule the daily log-cleanup cron event on deactivation.
      *
-     * Long Description.
+     * The log table and its data are intentionally left in place so logs survive
+     * a deactivate/reactivate cycle; only the scheduled cron is removed here.
      */
     public static function deactivate() {
         // Unschedule the daily log cleanup cron. The log table itself is kept

@@ -3,7 +3,7 @@
  * Plugin Name: iyzico Kolai for WooCommerce
  * Plugin URI: https://github.com/iyzico/iyzipay-kolai-for-woocommerce
  * Description: Kolai API entegrasyonu için ayarlar modülü
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: iyzico
  * Author URI: https://www.iyzico.com
  * License: GPLv2 or later
@@ -14,7 +14,7 @@
  * Requires at least: 5.0
  * Requires PHP: 7.2
  * WC requires at least: 5.0
- * WC tested up to: 9.8
+ * WC tested up to: 10.9.1
  */
 
 // Exit if accessed directly
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('KOLAI_VERSION', '1.6.0');
+define('KOLAI_VERSION', '1.7.0');
 define('KOLAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('KOLAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('KOLAI_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -34,7 +34,7 @@ define('KOLAI_VENDOR_DIR', KOLAI_INCLUDES_DIR . 'vendor/');
 /**
  * The code that runs during plugin activation
  */
-function activate_kolai() {
+function kolai_activate() {
     require_once KOLAI_INCLUDES_DIR . 'class-kolai-activator.php';
     Kolai_Activator::activate();
 }
@@ -42,13 +42,13 @@ function activate_kolai() {
 /**
  * The code that runs during plugin deactivation
  */
-function deactivate_kolai() {
+function kolai_deactivate() {
     require_once KOLAI_INCLUDES_DIR . 'class-kolai-deactivator.php';
     Kolai_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate_kolai');
-register_deactivation_hook(__FILE__, 'deactivate_kolai');
+register_activation_hook(__FILE__, 'kolai_activate');
+register_deactivation_hook(__FILE__, 'kolai_deactivate');
 
 /**
  * Declare compatibility with WooCommerce features.
@@ -59,23 +59,26 @@ register_deactivation_hook(__FILE__, 'deactivate_kolai');
  * - Cart/Checkout Blocks: the bundled gateway is hidden from checkout
  *   (is_available() returns false), so it imposes no requirement on the
  *   classic-vs-blocks checkout and is compatible with both.
+ * - Product Block Editor: the plugin adds no product-edit UI / meta boxes, so
+ *   it is neutral with respect to the new block-based product editor.
  */
 add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('product_block_editor', __FILE__, true);
     }
 });
 
 /**
  * Begins execution of the plugin
  */
-function run_kolai() {
+function kolai_run() {
     require_once KOLAI_INCLUDES_DIR . 'class-kolai-loader.php';
     require_once KOLAI_INCLUDES_DIR . 'class-kolai-core.php';
-    
+
     $plugin = new Kolai_Core();
     $plugin->run();
 }
 
-run_kolai();
+kolai_run();

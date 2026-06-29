@@ -33,6 +33,20 @@ POST /wp-json/kolai/v1/shipment-options
 }
 ```
 
+**Adet (quantity) destegi (tavsiye edilir).** `products` icinde sade urun id'leri yerine adet ve varyasyon bilgisini iceren nesneler de gonderebilirsiniz. Sade id listesi geriye donuk uyumlu olarak desteklenir (adet = 1 varsayilir):
+
+```json
+{
+  "products": [
+    { "productId": 12, "quantity": 2 },
+    { "productId": 34, "variationId": 41, "quantity": 1 }
+  ],
+  "address": { "countryId": "TR", "cityId": "34" }
+}
+```
+
+> Kargo fiyatinin siparis olusturma ile birebir eslesmesi icin, `/shipment-options` istegine `POST /orders` ile **ayni urun + adet** listesini gonderin. Adet gonderilmezse hem teklif hem siparis 1 adet uzerinden hesaplanir (eski davranis).
+
 Adres alanlari WooCommerce tarafinda su sekilde map edilir:
 - `countryId` -> `country`
 - `cityId` -> `state` (il/province). TR icin `34` gibi numeric degerler otomatik `TR34` olarak normalize edilir.

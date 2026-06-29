@@ -1,14 +1,15 @@
-# Copyright (C) 2026 iyzico. This file is distributed under the GPLv2 or later.
+# Copyright (C) 2026 iyzico
+# This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: iyzico Kolai for WooCommerce 1.5.0\n"
+"Project-Id-Version: iyzico Kolai for WooCommerce 1.7.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/iyzipay-kolai-for-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-29T10:15:26+00:00\n"
+"POT-Creation-Date: 2026-06-29T19:07:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: kolai\n"
@@ -62,195 +63,227 @@ msgstr ""
 msgid "Loglar temizlendi."
 msgstr ""
 
-#: admin/class-kolai-admin.php:147
+#: admin/class-kolai-admin.php:136
+#: admin/views/logs-page.php:170
+msgid "Yükleniyor…"
+msgstr ""
+
+#: admin/class-kolai-admin.php:137
+msgid "kayıt"
+msgstr ""
+
+#: admin/class-kolai-admin.php:138
+#: admin/views/logs-page.php:145
+msgid "Otomatik yenileme: kapalı"
+msgstr ""
+
+#: admin/class-kolai-admin.php:139
+msgid "Otomatik yenileme: 5 sn"
+msgstr ""
+
+#: admin/class-kolai-admin.php:140
+msgid "data"
+msgstr ""
+
+#: admin/class-kolai-admin.php:152
 msgid "Kolai Ayarlar"
 msgstr ""
 
-#: admin/class-kolai-admin.php:148
+#: admin/class-kolai-admin.php:153
 #: includes/class-kolai-core.php:93
 msgid "Kolai"
 msgstr ""
 
-#: admin/class-kolai-admin.php:158
-#: admin/class-kolai-admin.php:159
+#: admin/class-kolai-admin.php:163
+#: admin/class-kolai-admin.php:164
 #: admin/views/contracts-page.php:64
 msgid "Sozlesmeler"
 msgstr ""
 
-#: admin/class-kolai-admin.php:167
+#: admin/class-kolai-admin.php:172
 msgid "Meta Alan Eslesme"
 msgstr ""
 
-#: admin/class-kolai-admin.php:168
+#: admin/class-kolai-admin.php:173
 msgid "Meta Eslesme"
 msgstr ""
 
-#: admin/class-kolai-admin.php:176
-#: admin/class-kolai-admin.php:177
+#: admin/class-kolai-admin.php:181
+#: admin/class-kolai-admin.php:182
 msgid "Loglar"
 msgstr ""
 
-#: admin/class-kolai-admin.php:217
-#: admin/class-kolai-admin.php:271
+#: admin/class-kolai-admin.php:222
+#: admin/class-kolai-admin.php:276
 msgid "İzniniz yok."
 msgstr ""
 
-#: admin/class-kolai-settings.php:73
+#: admin/class-kolai-settings.php:74
 msgid "API Ayarları"
 msgstr ""
 
-#: admin/class-kolai-settings.php:81
+#: admin/class-kolai-settings.php:82
 msgid "API Key"
 msgstr ""
 
-#: admin/class-kolai-settings.php:91
+#: admin/class-kolai-settings.php:92
 msgid "Secret Key"
 msgstr ""
 
-#: admin/class-kolai-settings.php:110
+#: admin/class-kolai-settings.php:111
 msgid "Aydinlatma Metni Sayfasi"
 msgstr ""
 
-#: admin/class-kolai-settings.php:150
+#: admin/class-kolai-settings.php:151
 msgid "iyzico Iade / Iptal Ayarlari"
 msgstr ""
 
-#: admin/class-kolai-settings.php:157
+#: admin/class-kolai-settings.php:158
 msgid "iyzico API Key"
 msgstr ""
 
-#: admin/class-kolai-settings.php:166
+#: admin/class-kolai-settings.php:167
 msgid "iyzico Secret Key"
 msgstr ""
 
-#: admin/class-kolai-settings.php:175
+#: admin/class-kolai-settings.php:176
 msgid "iyzico Ortam"
 msgstr ""
 
-#: admin/class-kolai-settings.php:329
+#: admin/class-kolai-settings.php:330
 msgid "Meta Alan Anahtarlari"
 msgstr ""
 
-#: admin/class-kolai-settings.php:335
+#: admin/class-kolai-settings.php:336
 msgid "Fatura Tipi"
 msgstr ""
 
-#: admin/class-kolai-settings.php:336
+#: admin/class-kolai-settings.php:337
 msgid "Vergi / TC No"
 msgstr ""
 
-#: admin/class-kolai-settings.php:337
+#: admin/class-kolai-settings.php:338
 msgid "Vergi Dairesi"
 msgstr ""
 
-#: admin/class-kolai-settings.php:338
+#: admin/class-kolai-settings.php:339
 msgid "iyzico Payment ID"
 msgstr ""
 
-#: admin/class-kolai-settings.php:339
+#: admin/class-kolai-settings.php:340
 msgid "Item Transactions"
 msgstr ""
 
-#: admin/class-kolai-settings.php:340
+#: admin/class-kolai-settings.php:341
 msgid "Iade Kayitlari"
 msgstr ""
 
-#: admin/class-kolai-settings.php:341
+#: admin/class-kolai-settings.php:342
 msgid "Iptal Sonucu"
 msgstr ""
 
-#: admin/class-kolai-settings.php:356
+#: admin/class-kolai-settings.php:357
 msgid "Fatura Tipi Deger Eslesme"
 msgstr ""
 
-#: admin/class-kolai-settings.php:362
+#: admin/class-kolai-settings.php:363
 msgid "\"personal\" yerine kaydedilecek deger"
 msgstr ""
 
-#: admin/class-kolai-settings.php:363
+#: admin/class-kolai-settings.php:364
 msgid "\"company\" yerine kaydedilecek deger"
 msgstr ""
 
-#: admin/class-kolai-settings.php:465
+#: admin/class-kolai-settings.php:497
 msgid "Kolai API entegrasyonu için gerekli bilgileri girin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:472
+#: admin/class-kolai-settings.php:504
 msgid "Siparis iade ve iptal islemlerinin iyzico'ya iletilmesi icin iyzico API bilgilerinizi girin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:486
+#: admin/class-kolai-settings.php:518
 msgid "iyzico API Key girin"
 msgstr ""
 
-#: admin/class-kolai-settings.php:487
+#: admin/class-kolai-settings.php:519
 msgid "iyzico API Key'inizi buraya girin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:502
+#: admin/class-kolai-settings.php:535
+#: admin/class-kolai-settings.php:658
+msgid "Kayitli — degistirmek icin yeni deger girin"
+msgstr ""
+
+#: admin/class-kolai-settings.php:535
 msgid "iyzico Secret Key girin"
 msgstr ""
 
-#: admin/class-kolai-settings.php:503
+#: admin/class-kolai-settings.php:539
+#: admin/class-kolai-settings.php:662
+msgid "Bir gizli anahtar kayitli. Bos birakirsaniz mevcut anahtar korunur."
+msgstr ""
+
+#: admin/class-kolai-settings.php:540
 msgid "iyzico Secret Key'inizi buraya girin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:514
+#: admin/class-kolai-settings.php:553
 msgid "Sandbox (Test)"
 msgstr ""
 
-#: admin/class-kolai-settings.php:515
+#: admin/class-kolai-settings.php:554
 msgid "Production (Canli)"
 msgstr ""
 
-#: admin/class-kolai-settings.php:517
+#: admin/class-kolai-settings.php:556
 msgid "Test icin Sandbox, canli islemler icin Production secin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:525
+#: admin/class-kolai-settings.php:564
 msgid "Siparis verilerinin kaydedilecegi meta anahtar adlarini buradan ozellestirebilirsiniz. Bos birakirsaniz varsayilan anahtarlar kullanilir."
 msgstr ""
 
-#: admin/class-kolai-settings.php:526
+#: admin/class-kolai-settings.php:565
 msgid "Not: Anahtar adini degistirmek yalnizca bundan sonra olusturulacak/guncellenecek siparisleri etkiler; mevcut siparislerdeki veriler eski anahtarda kalir."
 msgstr ""
 
-#: admin/class-kolai-settings.php:533
+#: admin/class-kolai-settings.php:572
 msgid "Fatura tipi degerini diger eklentilerinizin bekledigi degerlerle eslestirin. Bos birakirsaniz \"personal\" / \"company\" olarak kaydedilir."
 msgstr ""
 
 #. translators: %s: default meta key
 #. translators: %s: default invoice value
-#: admin/class-kolai-settings.php:556
-#: admin/class-kolai-settings.php:583
+#: admin/class-kolai-settings.php:596
+#: admin/class-kolai-settings.php:624
 msgid "Varsayilan: %s"
 msgstr ""
 
-#: admin/class-kolai-settings.php:600
+#: admin/class-kolai-settings.php:641
 msgid "API Key girin"
 msgstr ""
 
-#: admin/class-kolai-settings.php:601
+#: admin/class-kolai-settings.php:642
 msgid "Kolai API Key'inizi buraya girin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:616
+#: admin/class-kolai-settings.php:658
 msgid "Secret Key girin"
 msgstr ""
 
-#: admin/class-kolai-settings.php:617
+#: admin/class-kolai-settings.php:663
 msgid "Kolai Secret Key'inizi buraya girin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:633
+#: admin/class-kolai-settings.php:681
 msgid "Sayfa secin"
 msgstr ""
 
-#: admin/class-kolai-settings.php:640
+#: admin/class-kolai-settings.php:688
 msgid "API icin var olan sayfalardan bir Aydinlatma Metni sayfasi secin."
 msgstr ""
 
-#: admin/class-kolai-settings.php:645
+#: admin/class-kolai-settings.php:693
 msgid "Secili sayfa linki:"
 msgstr ""
 
@@ -339,19 +372,19 @@ msgstr ""
 msgid "Kullanilabilir Yer Tutucular"
 msgstr ""
 
-#: admin/views/contracts-page.php:194
+#: admin/views/contracts-page.php:198
 msgid "Yer Tutuculari Goster/Gizle"
 msgstr ""
 
-#: admin/views/contracts-page.php:200
+#: admin/views/contracts-page.php:204
 msgid "Yer Tutucu"
 msgstr ""
 
-#: admin/views/contracts-page.php:201
+#: admin/views/contracts-page.php:205
 msgid "Aciklama"
 msgstr ""
 
-#: admin/views/contracts-page.php:246
+#: admin/views/contracts-page.php:250
 msgid "Sozlesmeleri Kaydet"
 msgstr ""
 
@@ -425,67 +458,71 @@ msgstr ""
 msgid "Log tutma şu anda kapalı. Yeni istekler kaydedilmeyecek; aşağıda yalnızca eski kayıtlar görünür."
 msgstr ""
 
-#: admin/views/logs-page.php:117
+#: admin/views/logs-page.php:116
+msgid "Seviyeye göre filtrele"
+msgstr ""
+
+#: admin/views/logs-page.php:118
 msgid "Tüm seviyeler"
 msgstr ""
 
 #: admin/views/logs-page.php:125
+msgid "Bağlama göre filtrele"
+msgstr ""
+
+#: admin/views/logs-page.php:127
 msgid "Tüm bağlamlar"
 msgstr ""
 
 #: admin/views/logs-page.php:133
+msgid "Loglarda ara"
+msgstr ""
+
+#: admin/views/logs-page.php:136
 msgid "Mesaj/data içinde ara…"
 msgstr ""
 
-#: admin/views/logs-page.php:138
+#: admin/views/logs-page.php:141
 msgid "Yenile"
 msgstr ""
 
-#: admin/views/logs-page.php:142
-msgid "Otomatik yenileme: kapalı"
-msgstr ""
-
-#: admin/views/logs-page.php:146
+#: admin/views/logs-page.php:149
 msgid "Tüm Logları Temizle"
 msgstr ""
 
-#: admin/views/logs-page.php:153
+#: admin/views/logs-page.php:158
 msgid "Zaman (UTC)"
 msgstr ""
 
-#: admin/views/logs-page.php:154
+#: admin/views/logs-page.php:159
 msgid "Seviye"
 msgstr ""
 
-#: admin/views/logs-page.php:155
+#: admin/views/logs-page.php:160
 msgid "Bağlam"
 msgstr ""
 
-#: admin/views/logs-page.php:156
+#: admin/views/logs-page.php:161
 msgid "Yöntem"
 msgstr ""
 
-#: admin/views/logs-page.php:157
+#: admin/views/logs-page.php:162
 msgid "Rota"
 msgstr ""
 
-#: admin/views/logs-page.php:158
+#: admin/views/logs-page.php:163
 msgid "Mesaj"
 msgstr ""
 
-#: admin/views/logs-page.php:159
+#: admin/views/logs-page.php:164
 msgid "Süre"
 msgstr ""
 
-#: admin/views/logs-page.php:165
-msgid "Yükleniyor…"
-msgstr ""
-
-#: admin/views/logs-page.php:172
+#: admin/views/logs-page.php:177
 msgid "Önceki"
 msgstr ""
 
-#: admin/views/logs-page.php:174
+#: admin/views/logs-page.php:179
 msgid "Sonraki"
 msgstr ""
 
@@ -526,61 +563,90 @@ msgstr ""
 msgid "Iade tutari belirtilmedi."
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:60
-#: includes/payment/class-kolai-refund-service.php:161
+#: includes/payment/class-kolai-refund-service.php:68
+#: includes/payment/class-kolai-refund-service.php:98
+#: includes/payment/class-kolai-refund-service.php:257
 msgid "Siparis bulunamadi."
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:64
-#: includes/payment/class-kolai-refund-service.php:165
+#: includes/payment/class-kolai-refund-service.php:72
+#: includes/payment/class-kolai-refund-service.php:261
 msgid "iyzico API anahtarlari ayarlanmamis."
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:69
+#: includes/payment/class-kolai-refund-service.php:77
 msgid "Iade tutari sifirdan buyuk olmalidir."
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:74
+#: includes/payment/class-kolai-refund-service.php:87
+msgid "Bu siparis icin baska bir iade islemi devam ediyor. Lutfen birkac saniye sonra tekrar deneyin."
+msgstr ""
+
+#: includes/payment/class-kolai-refund-service.php:103
 msgid "Bu siparis icin iyzico islem bilgisi bulunamadi."
 msgstr ""
 
 #. translators: %s: remaining amount that cannot be refunded
-#: includes/payment/class-kolai-refund-service.php:104
+#: includes/payment/class-kolai-refund-service.php:135
 msgid "Iade edilebilir tutar yetersiz. Karsilanamayan tutar: %s"
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:123
+#: includes/payment/class-kolai-refund-service.php:161
 msgid "iyzico iade islemi basarisiz."
 msgstr ""
 
+#. translators: 1: amount refunded, 2: amount that failed, 3: error message
+#: includes/payment/class-kolai-refund-service.php:173
+msgid "iyzico KISMI iade: %1$s iade edildi, %2$s BASARISIZ - %3$s. Kalan tutar icin iadeyi tekrar calistirin; mukerrer iade olmaz."
+msgstr ""
+
 #. translators: 1: amount, 2: transaction id, 3: error message
-#: includes/payment/class-kolai-refund-service.php:126
+#: includes/payment/class-kolai-refund-service.php:182
 msgid "iyzico iade BASARISIZ: %1$s (islem %2$s) - %3$s"
 msgstr ""
 
 #. translators: 1: amount, 2: transaction id
-#: includes/payment/class-kolai-refund-service.php:143
+#: includes/payment/class-kolai-refund-service.php:222
+msgid "iyzico iadesi ALINDI (%1$s, islem %2$s) ancak yerel iade kaydi guncellenemedi. Mukerrer iadeyi onlemek icin iadeyi yeniden calistirmadan once durumu MANUEL kontrol edin."
+msgstr ""
+
+#: includes/payment/class-kolai-refund-service.php:226
+msgid "iyzico iadesi alindi ancak yerel kayit guncellenemedi. Mukerrer iadeyi onlemek icin manuel kontrol gerekiyor."
+msgstr ""
+
+#. translators: 1: amount, 2: transaction id
+#: includes/payment/class-kolai-refund-service.php:234
 msgid "iyzico iade basarili: %1$s (islem %2$s)"
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:170
+#: includes/payment/class-kolai-refund-service.php:266
 msgid "Bu siparis icin iyzico paymentId bulunamadi."
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:186
+#: includes/payment/class-kolai-refund-service.php:282
 msgid "iyzico iptal islemi basarisiz."
 msgstr ""
 
 #. translators: 1: paymentId, 2: error message
-#: includes/payment/class-kolai-refund-service.php:189
+#: includes/payment/class-kolai-refund-service.php:285
 msgid "iyzico iptal BASARISIZ: paymentId %1$s - %2$s"
 msgstr ""
 
 #. translators: %s: paymentId
-#: includes/payment/class-kolai-refund-service.php:196
+#: includes/payment/class-kolai-refund-service.php:292
 msgid "iyzico iptal basarili: paymentId %s"
 msgstr ""
 
-#: includes/payment/class-kolai-refund-service.php:234
+#: includes/payment/class-kolai-refund-service.php:330
 msgid "Siparis iptal edildi ancak iyzico API anahtarlari ayarli olmadigi icin iyzico iptali yapilamadi."
+msgstr ""
+
+#. translators: 1: operation id, 2: original refund reason
+#: includes/payment/class-kolai-refund-service.php:570
+msgid "Kolai kismi iade mutabakati (islem %1$s). %2$s"
+msgstr ""
+
+#. translators: %s: amount
+#: includes/payment/class-kolai-refund-service.php:594
+msgid "Kolai: kismi iade icin yerel WooCommerce iade kaydi olusturuldu (%s)."
 msgstr ""

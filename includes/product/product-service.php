@@ -33,6 +33,13 @@ class Kolai_Product_Service {
     const MAX_VARIATIONS_PER_PRODUCT = 100;
 
     /**
+     * Hard cap on the number of explicit product IDs accepted via ?ids=.
+     * Prevents a signed caller from bypassing the per_page bound with thousands
+     * of IDs and exhausting memory/time.
+     */
+    const MAX_IDS = 200;
+
+    /**
      * Check if WooCommerce is active
      *
      * @return bool
@@ -109,6 +116,15 @@ class Kolai_Product_Service {
         $page     = max(1, (int) $args['page']);
         $per_page = max(1, min(self::MAX_PER_PAGE, (int) $args['per_page']));
         $ids      = is_array($args['ids']) ? array_values(array_filter(array_map('intval', $args['ids']))) : array();
+
+        // Bound an explicit ID list so it cannot bypass the per_page cap.
+        if (count($ids) > self::MAX_IDS) {
+            Kolai_Logger::warning('product', 'ids parameter exceeded cap; truncating', array(
+                'requested' => count($ids),
+                'cap'       => self::MAX_IDS,
+            ));
+            $ids = array_slice($ids, 0, self::MAX_IDS);
+        }
 
         Kolai_Logger::info('product', 'List query started', array(
             'page'     => $page,
@@ -341,10 +357,11 @@ class Kolai_Product_Service {
             'date_created'      => $product->get_date_created() ? $product->get_date_created()->date('c') : null,
             'date_modified'     => $product->get_date_modified() ? $product->get_date_modified()->date('c') : null,
 
-            // Prices
+            // Prices. sale_price is only the ACTIVE sale price: a scheduled or
+            // expired sale must not be advertised as live (use is_on_sale()).
             'price'             => floatval($product->get_price()),
             'regular_price'     => floatval($product->get_regular_price()),
-            'sale_price'        => $product->get_sale_price() ? floatval($product->get_sale_price()) : null,
+            'sale_price'        => $product->is_on_sale() ? floatval($product->get_sale_price()) : null,
             'date_on_sale_from' => $product->get_date_on_sale_from() ? $product->get_date_on_sale_from()->date('c') : null,
             'date_on_sale_to'   => $product->get_date_on_sale_to() ? $product->get_date_on_sale_to()->date('c') : null,
 
@@ -408,10 +425,11 @@ class Kolai_Product_Service {
             'date_created' => $product->get_date_created() ? $product->get_date_created()->date('c') : null,
             'date_modified' => $product->get_date_modified() ? $product->get_date_modified()->date('c') : null,
 
-            // Prices
+            // Prices. sale_price is only the ACTIVE sale price: a scheduled or
+            // expired sale must not be advertised as live (use is_on_sale()).
             'price' => floatval($product->get_price()),
             'regular_price' => floatval($product->get_regular_price()),
-            'sale_price' => $product->get_sale_price() ? floatval($product->get_sale_price()) : null,
+            'sale_price' => $product->is_on_sale() ? floatval($product->get_sale_price()) : null,
             'date_on_sale_from' => $product->get_date_on_sale_from() ? $product->get_date_on_sale_from()->date('c') : null,
             'date_on_sale_to' => $product->get_date_on_sale_to() ? $product->get_date_on_sale_to()->date('c') : null,
             'total_sales' => $product->get_total_sales(),
@@ -624,7 +642,8 @@ class Kolai_Product_Service {
                 'sku' => $variation->get_sku(),
                 'description' => $variation->get_description(),
                 'price' => floatval($variation->get_price()),
-                'sale_price' => $variation->get_sale_price() ? floatval($variation->get_sale_price()) : null,
+                // Only the ACTIVE sale price (honor scheduled/expired sales).
+                'sale_price' => $variation->is_on_sale() ? floatval($variation->get_sale_price()) : null,
                 'stock_status' => $variation->get_stock_status(),
                 'manage_stock' => $variation->get_manage_stock(),
                 'in_stock' => $variation->is_in_stock(),

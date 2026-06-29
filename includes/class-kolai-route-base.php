@@ -17,6 +17,12 @@ if (!defined('ABSPATH')) {
 abstract class Kolai_Route_Base {
 
     /**
+     * Hard cap (bytes) on the JSON-encoded request body stored in a log entry.
+     * Protects against unbounded PII/log growth from large payloads.
+     */
+    const MAX_LOG_BODY = 2000;
+
+    /**
      * Extra top-level meta fields to attach to the next 200 response body
      * (e.g. pagination metadata). Embedded in the JSON envelope rather than
      * sent as HTTP headers — some HTTP/2 / proxy stacks reject custom
@@ -87,7 +93,7 @@ abstract class Kolai_Route_Base {
             }
             return new WP_REST_Response($response, 200);
         } catch (Kolai_Exception $e) {
-            error_log(sprintf('[Kolai] %s (%s)', $e->getMessage(), $e->get_error_code()));
+            self::fallback_log(sprintf('%s (%s)', $e->getMessage(), $e->get_error_code()), 'warning');
 
             Kolai_Logger::warning('request', 'Domain exception thrown', array(
                 'class'        => get_class($e),
@@ -104,7 +110,7 @@ abstract class Kolai_Route_Base {
             return new WP_REST_Response($response, $e->getCode());
         } catch (Throwable $e) {
             // Throwable covers both Error (e.g. fatal type errors) and Exception in PHP 7+.
-            error_log(sprintf('[Kolai] Unexpected error: %s', $e->getMessage()));
+            self::fallback_log(sprintf('Unexpected error: %s', $e->getMessage()), 'error');
 
             Kolai_Logger::error('request', 'Unhandled exception', array(
                 'class'   => get_class($e),
@@ -124,7 +130,10 @@ abstract class Kolai_Route_Base {
     }
 
     /**
-     * Produce a request param snapshot safe to log (truncates long bodies).
+     * Produce a request param snapshot safe to log. Order/shipping bodies carry
+     * names, email, phone, tax id, and full billing/shipping addresses; this
+     * redacts every sensitive field and caps the encoded payload size so the log
+     * table never becomes a long-lived duplicate PII store.
      *
      * @param WP_REST_Request $request
      * @return array
@@ -137,21 +146,120 @@ abstract class Kolai_Route_Base {
 
         $body_summary = null;
         if (is_array($json) && !empty($json)) {
-            $body_summary = $json;
+            $body_summary = self::redact_payload($json);
         } elseif (is_array($body_params) && !empty($body_params)) {
-            $body_summary = $body_params;
+            $body_summary = self::redact_payload($body_params);
         } else {
             $raw = $request->get_body();
             if (is_string($raw) && $raw !== '') {
-                $body_summary = strlen($raw) > 500 ? substr($raw, 0, 500) . '... (truncated)' : $raw;
+                // Unparsed body: structure is unknown so it cannot be field-redacted.
+                // Record only its size, never its contents.
+                $body_summary = array('_unparsed_bytes' => strlen($raw));
             }
         }
 
         return array(
+            // Route params ({id}) are non-sensitive numerics.
             'url'   => $url_params,
-            'query' => $query,
+            'query' => self::redact_payload(is_array($query) ? $query : array()),
             'body'  => $body_summary,
         );
+    }
+
+    /**
+     * Redact sensitive fields from a structured payload and cap its encoded size.
+     *
+     * @param array $data
+     * @return array
+     */
+    private static function redact_payload($data) {
+        $redacted = self::redact_value($data, 0);
+        $encoded  = wp_json_encode($redacted);
+        if (is_string($encoded) && strlen($encoded) > self::MAX_LOG_BODY) {
+            return array('_redacted_summary' => substr($encoded, 0, self::MAX_LOG_BODY) . '… (truncated)');
+        }
+        return is_array($redacted) ? $redacted : array('_value' => $redacted);
+    }
+
+    /**
+     * Recursively replace sensitive values with a redaction marker. Sensitive
+     * container keys (buyer/billingAddress/shippingAddress/address) are dropped
+     * wholesale; sensitive scalar keys anywhere are masked.
+     *
+     * @param mixed $value
+     * @param int   $depth
+     * @return mixed
+     */
+    private static function redact_value($value, $depth) {
+        if ($depth > 6) {
+            return '[redacted-depth]';
+        }
+        if (is_array($value)) {
+            $out = array();
+            foreach ($value as $k => $v) {
+                if (is_string($k) && self::is_sensitive_key($k)) {
+                    $out[$k] = '[redacted]';
+                    continue;
+                }
+                $out[$k] = self::redact_value($v, $depth + 1);
+            }
+            return $out;
+        }
+        if (is_string($value) && strlen($value) > 120) {
+            return substr($value, 0, 120) . '…';
+        }
+        return $value;
+    }
+
+    /**
+     * Whether a payload key names personal / contact / tax / payment data that
+     * must never be persisted to the log table.
+     *
+     * @param string $key
+     * @return bool
+     */
+    private static function is_sensitive_key($key) {
+        $k = strtolower($key);
+
+        static $exact = array(
+            'buyer', 'billingaddress', 'shippingaddress', 'address', 'itemtransactions',
+        );
+        if (in_array($k, $exact, true)) {
+            return true;
+        }
+
+        // Substrings checked anywhere in a key. Kept specific enough to avoid
+        // false positives on benign keys (e.g. 'pan' would wrongly match
+        // 'company'; bare 'lat'/'lng' would match 'late'/'flat'). Card data is
+        // covered by 'card'/'iban'/'cvv'; coordinates by 'latitude'/'longitude'.
+        static $fragments = array(
+            'email', 'phone', 'gsm', 'name', 'surname', 'identity', 'tckn',
+            'taxid', 'taxoffice', 'address', 'city', 'district', 'town', 'zip',
+            'postcode', 'postal', 'street', 'iban', 'card', 'cvv', 'cvc',
+            'payment', 'latitude', 'longitude', 'contact',
+        );
+        foreach ($fragments as $fragment) {
+            if (strpos($k, $fragment) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Last-resort log to WooCommerce's structured logger (falls back to the PHP
+     * error log only when WooCommerce is unavailable).
+     *
+     * @param string $message
+     * @param string $level
+     * @return void
+     */
+    private static function fallback_log($message, $level = 'error') {
+        if (function_exists('wc_get_logger')) {
+            wc_get_logger()->log($level, $message, array('source' => 'kolai'));
+            return;
+        }
+        error_log('[Kolai] ' . $message); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
     }
 
     /**

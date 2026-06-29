@@ -156,7 +156,21 @@ kolai/
 
 ## Sürüm Notları
 
+### 1.7.0
+- **Güvenlik ve güvenilirlik sıkılaştırması** (inceleme sonrası remediation).
+- **İade**: Çok kalemli iadeler artık atomik ve kurtarılabilir — sipariş bazlı kilit eşzamanlı çift iadeyi önler, her denemenin benzersiz idempotency kimliği vardır, kalıcı işlem defteri tutulur, başarılı uzak iadeden sonra yerel kayıt yazılamazsa işlem durdurulup mutabakat için işaretlenir, kısmi başarı yerel WooCommerce iade kaydı olarak korunur.
+- **Kimlik doğrulama**: API key veya secret boşsa istekler reddedilir (fail-closed), client id sabit zamanlı karşılaştırılır, tekrar (replay) saldırıları tek kullanımlık salt + opsiyonel imzalı `timestamp` ile engellenir (bkz. [AUTH.md](AUTH.md)).
+- **Sipariş**: Başarılı ödeme artık WooCommerce `payment_complete()` yaşam döngüsünden geçer; başarısız sipariş oluşturma artık öksüz (orphan) sipariş bırakmaz.
+- **Ürün**: `salePrice` yalnızca indirim gerçekten aktifken (`is_on_sale()`) döner; varyasyon kırpılması `variationsTruncated` / `variationsMax` ile açıkça bildirilir; `?ids=` listesi sınırlandırıldı.
+- **Kargo**: Teklif ve sipariş kargosu gerçek ürün adetlerini (ve varyasyonları) dikkate alır; `/shipment-options` opsiyonel `quantity` kabul eder (geriye dönük uyumlu).
+- **Gizlilik & log**: İstek logları kişisel/iletişim/vergi/ödeme alanlarını maskeler ve boyutu sınırlar; doğrudan `error_log()` çağrıları WooCommerce yapısal loglayıcısına taşındı.
+- **Yönetim**: Erişilebilirlik (etiketler/ARIA/canlı durum), responsive/RTL CSS ve maskeli gizli anahtar alanları (boş bırakılırsa mevcut değer korunur).
+- Uyumluluk: Product Block Editor uyumluluğu bildirildi; WooCommerce 10.9.x / WordPress 6.9 ile test edildi.
+
 ### 1.6.0
+- **Vergi (KDV)**: Ürün endpoint'leri artık vergi dahil `price`/`salePrice` ile birlikte `includedTax` / `taxPrice` / `taxPercentage` dökümünü döner; sipariş `discountAmount` değeri, vergi dahil toplamları tutarlı tutmak için vergiye duyarlı negatif fee olarak uygulanır.
+
+### 1.5.0
 - **iyzico İade / İptal entegrasyonu**: WooCommerce yönetici panelinden yapılan iade ve iptal işlemleri otomatik olarak iyzico'ya iletilir. Detay [REFUND.md](REFUND.md).
 - iyzipay-php SDK `includes/vendor/iyzipay-php/` altında bundle edildi.
 - İade, `kolai-app` ödeme geçidi üzerinden native "İade et" butonu ile çalışır (`process_refund`); tutar kayıtlı `itemTransactions` kalemlerine dağıtılır. İptal, `woocommerce_order_status_cancelled` hook'u ile `paymentId` üzerinden yapılır.

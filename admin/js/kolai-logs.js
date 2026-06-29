@@ -24,6 +24,14 @@
     var $next      = $('#kolai-logs-next');
     var $pageInfo  = $('#kolai-logs-pageinfo');
     var $countBadge = $('.kolai-logs-count');
+    var $status    = $('#kolai-logs-status');
+
+    function setBusy(isBusy, message) {
+        $tbody.attr('aria-busy', isBusy ? 'true' : 'false');
+        if (typeof message === 'string') {
+            $status.text(message);
+        }
+    }
 
     function escapeHtml(value) {
         if (value === null || typeof value === 'undefined') {
@@ -59,7 +67,7 @@
         }
 
         var html = rows.map(function (row) {
-            var dataPreview = row.data ? '<button type="button" class="button-link kolai-log-toggle" aria-expanded="false">▶ data</button>' : '';
+            var dataPreview = row.data ? '<button type="button" class="button-link kolai-log-toggle" aria-expanded="false">▶ ' + escapeHtml(KolaiLogs.i18n.dataLabel) + '</button>' : '';
             var dataBlock   = row.data
                 ? '<pre class="kolai-log-data" hidden aria-hidden="true">' + escapeHtml(formatJson(row.data)) + '</pre>'
                 : '';
@@ -90,7 +98,7 @@
         if (state.page > totalPages) {
             state.page = totalPages;
         }
-        $pageInfo.text(state.page + ' / ' + totalPages + '  (' + state.total + ' kayıt)');
+        $pageInfo.text(state.page + ' / ' + totalPages + '  (' + state.total + ' ' + KolaiLogs.i18n.records + ')');
         $prev.prop('disabled', state.page <= 1);
         $next.prop('disabled', state.page >= totalPages);
         $countBadge.text('(' + state.total + ')');
@@ -109,9 +117,10 @@
     }
 
     function fetchLogs() {
+        setBusy(true, KolaiLogs.i18n.loading);
         $tbody.html(
             '<tr><td colspan="7" class="kolai-logs-loading">' +
-            escapeHtml('Yükleniyor…') +
+            escapeHtml(KolaiLogs.i18n.loading) +
             '</td></tr>'
         );
 
@@ -126,14 +135,17 @@
         }).done(function (resp) {
             if (!resp || !resp.success) {
                 $tbody.html('<tr><td colspan="7" class="kolai-logs-error">' + escapeHtml(KolaiLogs.i18n.fetchError) + '</td></tr>');
+                setBusy(false, KolaiLogs.i18n.fetchError);
                 return;
             }
             state.total = resp.data.total || 0;
             renderRows(resp.data.rows);
             refreshContextOptions(resp.data.contexts);
             updatePagination();
+            setBusy(false, '');
         }).fail(function () {
             $tbody.html('<tr><td colspan="7" class="kolai-logs-error">' + escapeHtml(KolaiLogs.i18n.fetchError) + '</td></tr>');
+            setBusy(false, KolaiLogs.i18n.fetchError);
         });
     }
 
@@ -166,10 +178,10 @@
         if (on) {
             window.clearInterval(state.autoTimer);
             state.autoTimer = null;
-            $autoBtn.attr('data-on', '0').text('Otomatik yenileme: kapalı');
+            $autoBtn.attr('data-on', '0').attr('aria-pressed', 'false').text(KolaiLogs.i18n.autoOff);
         } else {
             state.autoTimer = window.setInterval(fetchLogs, 5000);
-            $autoBtn.attr('data-on', '1').text('Otomatik yenileme: 5 sn');
+            $autoBtn.attr('data-on', '1').attr('aria-pressed', 'true').text(KolaiLogs.i18n.autoOn);
         }
     }
 
@@ -223,7 +235,7 @@
         $pre.prop('hidden', open);
         $pre.attr('aria-hidden', open ? 'true' : 'false');
         $btn.attr('aria-expanded', open ? 'false' : 'true');
-        $btn.text((open ? '▶' : '▼') + ' data');
+        $btn.text((open ? '▶' : '▼') + ' ' + KolaiLogs.i18n.dataLabel);
     });
 
     // Initial load

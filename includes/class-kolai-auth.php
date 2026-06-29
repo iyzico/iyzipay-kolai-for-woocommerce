@@ -37,6 +37,23 @@ class Kolai_Auth {
     const AUTH_PREFIX = 'IYZ-TP-v2 ';
 
     /**
+     * Maximum allowed clock skew (seconds) for a signed `timestamp`, when the
+     * client sends one. Requests older/newer than this are rejected as stale.
+     */
+    const MAX_TIMESTAMP_SKEW = 300;
+
+    /**
+     * How long (seconds) a consumed request salt is remembered to block replays.
+     * Bounds the replay window for clients that do not yet sign a timestamp.
+     */
+    const NONCE_TTL = 600;
+
+    /**
+     * Object-cache / transient group for consumed nonces.
+     */
+    const NONCE_GROUP = 'kolai_auth_nonce';
+
+    /**
      * Validate the HMAC-SHA256 signed request.
      *
      * @param WP_REST_Request $request        The incoming REST request.
@@ -107,12 +124,23 @@ class Kolai_Auth {
             }
         }
 
-        // Validate clientId
-        $stored_api_key = get_option('kolai_api_key', '');
-        if ($stored_api_key === '' || $params['clientId'] !== $stored_api_key) {
+        // Load both credentials and FAIL CLOSED unless both are configured and
+        // non-empty. An empty secret would let anyone forge a valid HMAC with the
+        // known empty key; an empty client id can never match a real one.
+        $stored_api_key = (string) get_option('kolai_api_key', '');
+        $stored_secret  = (string) get_option('kolai_secret_key', '');
+        if ($stored_api_key === '' || $stored_secret === '') {
+            Kolai_Logger::warning('auth', 'Server credentials not configured', array(
+                'api_key_empty' => ($stored_api_key === ''),
+                'secret_empty'  => ($stored_secret === ''),
+            ));
+            throw new Kolai_Unauthorized_Exception('Server credentials not configured');
+        }
+
+        // Validate clientId in constant time. Never log the received value.
+        if (!hash_equals($stored_api_key, (string) $params['clientId'])) {
             Kolai_Logger::warning('auth', 'Invalid client credentials', array(
-                'stored_empty'    => ($stored_api_key === ''),
-                'received_client' => $params['clientId'],
+                'received_length' => strlen((string) $params['clientId']),
             ));
             throw new Kolai_Unauthorized_Exception('Invalid client credentials');
         }
@@ -136,10 +164,21 @@ class Kolai_Auth {
         // Raw request body (empty string for GET)
         $body = $request->get_body();
 
-        // Reconstruct and verify HMAC-SHA256 signature
-        $secret = get_option('kolai_secret_key', '');
+        // Reconstruct and verify HMAC-SHA256 signature.
+        //
+        // Replay protection (backward compatible): when the client sends a signed
+        // `timestamp` (unix epoch seconds), it is appended to the HMAC message so
+        // it cannot be tampered with, and the request is rejected if it falls
+        // outside MAX_TIMESTAMP_SKEW. Clients that do not yet send a timestamp are
+        // still protected by single-use salt consumption below (bounded by
+        // NONCE_TTL); a deprecation notice is logged so the signer can be updated.
+        $timestamp = isset($params['timestamp']) ? (string) $params['timestamp'] : '';
+
         $payload = $params['salt'] . $params['scope'] . $uri_path . $body;
-        $expected_signature = hash_hmac('sha256', $payload, $secret);
+        if ($timestamp !== '') {
+            $payload .= $timestamp;
+        }
+        $expected_signature = hash_hmac('sha256', $payload, $stored_secret);
 
         if (!hash_equals($expected_signature, $params['signature'])) {
             Kolai_Logger::warning('auth', 'Invalid signature', array(
@@ -147,16 +186,74 @@ class Kolai_Auth {
                 'body_length' => strlen($body),
                 'salt'        => $params['salt'],
                 'scope'       => $params['scope'],
+                'has_timestamp' => ($timestamp !== ''),
                 // Never log the actual signatures or the secret key — that defeats the purpose.
                 'signature_match' => false,
             ));
             throw new Kolai_Unauthorized_Exception('Invalid signature');
         }
 
+        // Signature is authentic: the timestamp (if any) is now trustworthy.
+        if ($timestamp !== '') {
+            if (!is_numeric($timestamp)) {
+                throw new Kolai_Unauthorized_Exception('Invalid timestamp');
+            }
+            $skew = abs(time() - (int) $timestamp);
+            if ($skew > self::MAX_TIMESTAMP_SKEW) {
+                Kolai_Logger::warning('auth', 'Stale request rejected', array(
+                    'skew_seconds' => $skew,
+                    'max_skew'     => self::MAX_TIMESTAMP_SKEW,
+                ));
+                throw new Kolai_Unauthorized_Exception('Request timestamp outside allowed window');
+            }
+        } else {
+            Kolai_Logger::warning('auth', 'Request signed without a timestamp (deprecated)', array(
+                'scope'    => $params['scope'],
+                'uri_path' => $uri_path,
+            ));
+        }
+
+        // Single-use salt: an exact replay reuses the same (already signed) salt.
+        // Consume it only after the signature is verified, so invalid traffic can
+        // never poison the nonce store.
+        if (!self::consume_nonce($params['clientId'] . '|' . $params['salt'])) {
+            Kolai_Logger::warning('auth', 'Replayed request rejected', array(
+                'scope'    => $params['scope'],
+                'uri_path' => $uri_path,
+            ));
+            throw new Kolai_Unauthorized_Exception('Replayed request rejected');
+        }
+
         Kolai_Logger::info('auth', 'Auth validation passed', array(
             'scope'    => $params['scope'],
             'uri_path' => $uri_path,
         ));
+    }
+
+    /**
+     * Atomically consume a one-time request identifier (the signed salt). Returns
+     * true on first use, false if the identifier was already seen within NONCE_TTL.
+     *
+     * Uses an atomic object-cache add when a persistent cache is present
+     * (Redis/Memcached); otherwise falls back to a transient. The transient path
+     * has a narrow check-then-set window but still blocks practical replays.
+     *
+     * @param string $identifier
+     * @return bool
+     */
+    private static function consume_nonce($identifier) {
+        $key = 'kolai_nonce_' . md5($identifier);
+
+        if (wp_using_ext_object_cache()) {
+            return (bool) wp_cache_add($key, 1, self::NONCE_GROUP, self::NONCE_TTL);
+        }
+
+        $transient = 'kolai_n_' . md5($identifier);
+        if (get_transient($transient) !== false) {
+            return false;
+        }
+        set_transient($transient, 1, self::NONCE_TTL);
+        return true;
     }
 
     /**

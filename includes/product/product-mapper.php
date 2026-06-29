@@ -121,7 +121,22 @@ class Kolai_Product_Mapper {
         
         // Additional fields for compatibility - WooCommerce default structure
         if (isset($product_data['variations']) && is_array($product_data['variations'])) {
-            $mapped['variations'] = self::map_variations($product_data['variations']);
+            // The service appends a truncation sentinel when a variable product has
+            // more variations than the safety cap. Surface it as explicit top-level
+            // metadata so the consumer can detect incomplete data, instead of
+            // silently mapping it to an empty variation.
+            $variations = array();
+            foreach ($product_data['variations'] as $variation) {
+                if (is_array($variation) && !empty($variation['_truncated'])) {
+                    $mapped['variationsTruncated'] = true;
+                    if (isset($variation['_max'])) {
+                        $mapped['variationsMax'] = (int) $variation['_max'];
+                    }
+                    continue;
+                }
+                $variations[] = $variation;
+            }
+            $mapped['variations'] = self::map_variations($variations);
         }
         if (isset($product_data['attributes'])) $mapped['attributes'] = $product_data['attributes'];
         

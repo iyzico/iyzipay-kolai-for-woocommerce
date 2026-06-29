@@ -303,8 +303,14 @@ class Kolai_Logger {
                 array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d')
             );
         } catch (Exception $e) {
-            // Swallow logging failures. Fall back to error_log so we don't lose the trace entirely.
-            error_log(sprintf('[Kolai Logger] %s', $e->getMessage()));
+            // Swallow logging failures. Fall back to WooCommerce's structured logger
+            // (or the PHP error log if WooCommerce is unavailable) so the trace is
+            // not lost entirely.
+            if (function_exists('wc_get_logger')) {
+                wc_get_logger()->error(sprintf('[Kolai Logger] %s', $e->getMessage()), array('source' => 'kolai'));
+            } else {
+                error_log(sprintf('[Kolai Logger] %s', $e->getMessage())); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            }
         }
     }
 

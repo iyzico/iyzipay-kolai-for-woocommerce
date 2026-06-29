@@ -22,7 +22,7 @@ Authorization: IYZ-TP-v2 {base64_payload}
 Base64 payload cozuldugunde:
 
 ```
-clientId:{deger}&salt:{deger}&scope:{deger}&signature:{deger}
+clientId:{deger}&salt:{deger}&scope:{deger}&timestamp:{deger}&signature:{deger}
 ```
 
 | Alan        | Aciklama                                                  |
@@ -30,12 +30,13 @@ clientId:{deger}&salt:{deger}&scope:{deger}&signature:{deger}
 | `clientId`  | wp_options'taki `kolai_api_key` ile eslesmelidir          |
 | `salt`      | Her istek icin uretilen rastgele UUID                     |
 | `scope`     | Endpoint'e ozel enum degeri (asagidaki tabloya bakiniz)   |
+| `timestamp` | (Opsiyonel, tavsiye edilir) Istegin uretildigi unix epoch saniyesi |
 | `signature` | HMAC-SHA256 hex ozeti                                     |
 
 ## Imza Hesaplama
 
 ```
-signature = HMAC-SHA256(secretKey, salt + scope + uriPath + requestBody)
+signature = HMAC-SHA256(secretKey, salt + scope + uriPath + requestBody + timestamp)
 ```
 
 - **secretKey**: wp_options'taki `kolai_secret_key` degeri
@@ -43,8 +44,16 @@ signature = HMAC-SHA256(secretKey, salt + scope + uriPath + requestBody)
 - **scope**: Header'daki scope dizesi
 - **uriPath**: URL'nin path kismi (orn. `/wp-json/kolai/v1/products/123`), query string haric
 - **requestBody**: POST/PATCH icin ham JSON body; GET icin bos string
+- **timestamp**: Gonderildiginde imza mesajinin **sonuna** eklenir (unix epoch saniye). Gonderilmediginde imza mesajina hicbir sey eklenmez (geriye donuk uyumlu).
 
 Sonuc hex olarak kodlanir (kucuk harf).
+
+## Tekrar Saldirisi (Replay) Korumasi
+
+- **Tek kullanimlik salt**: Sunucu, dogrulanan her istegin `salt` degerini kisa bir sure (varsayilan 600 sn) hatirlar. Ayni imzali istek aynen tekrar gonderilirse (ayni salt) `Replayed request rejected` hatasi ile reddedilir. Bu koruma **istemci tarafinda degisiklik gerektirmez** — her istek zaten benzersiz bir salt uretir.
+- **Zaman damgasi (timestamp)**: Istemci imzali bir `timestamp` gonderdiginde, sunucu istegi izin verilen pencerenin (varsayilan ±300 sn) disindaysa `Request timestamp outside allowed window` ile reddeder. Bu, salt hatirlama suresinin otesindeki tekrarlari da engeller.
+- **Gecis**: `timestamp` gondermeyen istemciler calismaya devam eder ancak sunucu bir deprecation uyarisi loglar. Java imzalayicisi guncellenip her istege `timestamp` ekledikten sonra tam koruma devreye girer.
+- **Gizli anahtar zorunlulugu**: `kolai_api_key` veya `kolai_secret_key` bos ise tum istekler `Server credentials not configured` ile reddedilir (fail-closed).
 
 ## Scope Eslemesi
 

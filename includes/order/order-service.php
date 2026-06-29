@@ -80,38 +80,48 @@ class Kolai_Order_Service {
 
         Kolai_Logger::info('order', 'Order shell created', array('order_id' => $order->get_id()));
 
-        $customer_id = $this->resolve_customer_id($buyer['email']);
-        if ($customer_id) {
-            $order->set_customer_id($customer_id);
+        // Everything below mutates the freshly-created order shell. If any step
+        // fails (invalid shipment option, discount over total, …) delete the
+        // shell so a failed request never leaves an orphan order behind.
+        try {
+            $customer_id = $this->resolve_customer_id($buyer['email']);
+            if ($customer_id) {
+                $order->set_customer_id($customer_id);
+            }
+
+            $order->set_address(Kolai_Address::build_order_address($billing, $buyer, true), 'billing');
+            $order->set_address(Kolai_Address::build_order_address($shipping, $buyer, false), 'shipping');
+            $this->apply_billing_invoice_meta($order, $billing);
+
+            foreach ($items as $item) {
+                $order->add_product($item['product'], $item['quantity']);
+            }
+
+            // Pass the real quantities (and variation ids) so the shipping rate is
+            // calculated against the actual package, not one unit per product.
+            $shipping_service = new Kolai_Shipping_Service();
+            $rate = $shipping_service->get_rate_by_id($this->extract_shipping_lines($items), $shipping, $shipment_option_id);
+
+            $shipping_item = new WC_Order_Item_Shipping();
+            $shipping_item->set_shipping_rate($rate);
+            $order->add_item($shipping_item);
+
+            $order->set_currency(get_woocommerce_currency());
+            $order->set_payment_method('kolai-app');
+            $order->set_payment_method_title('Kolai App');
+
+            $order->calculate_totals();
+
+            if (!is_null($discount_amount)) {
+                $this->apply_discount($order, $discount_amount);
+            }
+
+            $order->set_status('pending');
+            $order->save();
+        } catch (Throwable $e) {
+            $this->delete_order_shell($order);
+            throw $e;
         }
-
-        $order->set_address(Kolai_Address::build_order_address($billing, $buyer, true), 'billing');
-        $order->set_address(Kolai_Address::build_order_address($shipping, $buyer, false), 'shipping');
-        $this->apply_billing_invoice_meta($order, $billing);
-
-        foreach ($items as $item) {
-            $order->add_product($item['product'], $item['quantity']);
-        }
-
-        $shipping_service = new Kolai_Shipping_Service();
-        $rate = $shipping_service->get_rate_by_id($this->extract_product_ids($items), $shipping, $shipment_option_id);
-
-        $shipping_item = new WC_Order_Item_Shipping();
-        $shipping_item->set_shipping_rate($rate);
-        $order->add_item($shipping_item);
-
-        $order->set_currency(get_woocommerce_currency());
-        $order->set_payment_method('kolai-app');
-        $order->set_payment_method_title('Kolai App');
-
-        $order->calculate_totals();
-
-        if (!is_null($discount_amount)) {
-            $this->apply_discount($order, $discount_amount);
-        }
-
-        $order->set_status('pending');
-        $order->save();
 
         Kolai_Logger::info('order', 'Order saved', array(
             'order_id' => $order->get_id(),
@@ -134,6 +144,26 @@ class Kolai_Order_Service {
             'paymentMethod' => $order->get_payment_method(),
             'orderExpireAt' => $order_expire_at,
         );
+    }
+
+    /**
+     * Force-delete a partially-built order shell after a creation failure.
+     *
+     * @param WC_Order $order
+     * @return void
+     */
+    private function delete_order_shell($order) {
+        try {
+            $order->delete(true);
+            Kolai_Logger::info('order', 'Deleted orphan order shell after creation failure', array(
+                'order_id' => $order->get_id(),
+            ));
+        } catch (Throwable $inner) {
+            Kolai_Logger::error('order', 'Failed to delete orphan order shell', array(
+                'order_id' => $order->get_id(),
+                'error'    => $inner->getMessage(),
+            ));
+        }
     }
 
     /**
@@ -194,9 +224,38 @@ class Kolai_Order_Service {
         if (!in_array($new_status, $valid_slugs, true)) {
             throw new Kolai_Invalid_Order_Request_Exception('Invalid orderStatus: ' . $new_status);
         }
-        $order->set_status($new_status);
+
+        // Persist iyzico payment fields first so payment_complete() and any
+        // downstream integrations observe them on the order.
         $this->apply_payment_meta($order, $payload);
-        $order->save();
+
+        $payment_id    = isset($payload['paymentId']) ? trim((string) $payload['paymentId']) : '';
+        $paid_statuses = function_exists('wc_get_is_paid_statuses')
+            ? wc_get_is_paid_statuses()
+            : array('processing', 'completed');
+
+        if ($payment_id !== '' && in_array($new_status, $paid_statuses, true)) {
+            // A successful payment must go through WooCommerce's payment-completion
+            // lifecycle, not a bare set_status(): payment_complete() records the
+            // transaction id and date_paid, reduces stock exactly once, and fires
+            // woocommerce_payment_complete for downstream integrations. It is a
+            // no-op when the order is already paid, so calling it is idempotent.
+            $order->payment_complete($payment_id);
+
+            // payment_complete() picks the status via the
+            // woocommerce_payment_complete_order_status filter (default
+            // 'processing'); honor an explicitly requested paid status if different.
+            if ($order->get_status() !== $new_status) {
+                $order->set_status($new_status);
+            }
+            // Ensure queued meta and any status override persist even when
+            // payment_complete() short-circuited on an already-paid order.
+            $order->save();
+        } else {
+            $order->set_status($new_status);
+            $order->save();
+        }
+
         return $this->format_order_response($order);
     }
 
@@ -417,17 +476,30 @@ class Kolai_Order_Service {
     }
 
     /**
-     * Extract product ids from items.
+     * Build quantity-aware shipping lines from validated order items so the
+     * shipping rate is calculated against the real package (quantities and
+     * variations), not one unit per product.
      *
      * @param array $items
-     * @return array
+     * @return array<int,array{productId:int,variationId:int,quantity:int}>
      */
-    private function extract_product_ids($items) {
-        $ids = array();
+    private function extract_shipping_lines($items) {
+        $lines = array();
         foreach ($items as $item) {
-            $ids[] = $item['product']->get_id();
+            $product      = $item['product'];
+            $product_id   = $product->get_id();
+            $variation_id = 0;
+            if ($product->is_type('variation')) {
+                $variation_id = $product->get_id();
+                $product_id   = $product->get_parent_id();
+            }
+            $lines[] = array(
+                'productId'   => $product_id,
+                'variationId' => $variation_id,
+                'quantity'    => (int) $item['quantity'],
+            );
         }
-        return $ids;
+        return $lines;
     }
 
     /**
@@ -494,5 +566,20 @@ class Kolai_Order_Service {
         // Pass false so calculate_totals does NOT recompute taxes and overwrite
         // the negative tax we allocated on the discount fee above.
         $order->calculate_totals(false);
+
+        // Invariant: the order total must drop by exactly the requested discount.
+        // Per-rate rounding can introduce sub-cent drift; flag anything larger so
+        // a real allocation bug is never silently shipped.
+        $total_after = (float) $order->get_total();
+        $drift = round(($total_before - $total_after) - $discount, 2);
+        if (abs($drift) > 0.01) {
+            Kolai_Logger::warning('order', 'Discount invariant drift detected', array(
+                'order_id'     => $order->get_id(),
+                'total_before' => round($total_before, 2),
+                'total_after'  => round($total_after, 2),
+                'discount'     => round($discount, 2),
+                'drift'        => $drift,
+            ));
+        }
     }
 }

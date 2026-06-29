@@ -56,13 +56,14 @@ class Kolai_Settings {
             )
         );
         
-        // Register Secret Key setting
+        // Register Secret Key setting. The field is masked and a blank submission
+        // keeps the existing secret, so it is never echoed back into the page.
         register_setting(
             'kolai_settings_group',
             'kolai_secret_key',
             array(
                 'type' => 'string',
-                'sanitize_callback' => 'sanitize_text_field',
+                'sanitize_callback' => array($this, 'sanitize_secret_key'),
                 'default' => ''
             )
         );
@@ -130,7 +131,7 @@ class Kolai_Settings {
             'kolai_iyzico_secret_key',
             array(
                 'type' => 'string',
-                'sanitize_callback' => 'sanitize_text_field',
+                'sanitize_callback' => array($this, 'sanitize_iyzico_secret_key'),
                 'default' => ''
             )
         );
@@ -347,7 +348,7 @@ class Kolai_Settings {
                 array($this, 'render_meta_key_field'),
                 'kolai-meta-map',
                 'kolai_meta_map_section',
-                array('field' => $field)
+                array('field' => $field, 'label_for' => 'kolai_meta_key_' . $field)
             );
         }
 
@@ -369,7 +370,7 @@ class Kolai_Settings {
                 array($this, 'render_invoice_value_field'),
                 'kolai-meta-map',
                 'kolai_meta_invoice_value_section',
-                array('canonical' => $canonical)
+                array('canonical' => $canonical, 'label_for' => 'kolai_invoice_value_' . $canonical)
             );
         }
     }
@@ -459,10 +460,41 @@ class Kolai_Settings {
     }
 
     /**
+     * Sanitize the Kolai HMAC secret. A blank submission keeps the stored value
+     * (the field is masked and never repopulated), so saving other settings does
+     * not wipe the secret.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public function sanitize_secret_key($value) {
+        $value = sanitize_text_field((string) $value);
+        if ($value === '') {
+            return (string) get_option('kolai_secret_key', '');
+        }
+        return $value;
+    }
+
+    /**
+     * Sanitize the iyzico refund/cancel secret. Blank submission keeps the stored
+     * value (masked field, never repopulated).
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public function sanitize_iyzico_secret_key($value) {
+        $value = sanitize_text_field((string) $value);
+        if ($value === '') {
+            return (string) get_option('kolai_iyzico_secret_key', '');
+        }
+        return $value;
+    }
+
+    /**
      * Render the section description
      */
     public function render_section_callback() {
-        echo '<p>' . __('Kolai API entegrasyonu için gerekli bilgileri girin.', 'kolai') . '</p>';
+        echo '<p>' . esc_html__('Kolai API entegrasyonu için gerekli bilgileri girin.', 'kolai') . '</p>';
     }
 
     /**
@@ -492,15 +524,22 @@ class Kolai_Settings {
      * Render iyzico Secret Key field
      */
     public function render_iyzico_secret_key_field() {
-        $secret_key = get_option('kolai_iyzico_secret_key', '');
+        $has_secret = get_option('kolai_iyzico_secret_key', '') !== '';
         ?>
         <input type="password"
                name="kolai_iyzico_secret_key"
                id="kolai_iyzico_secret_key"
-               value="<?php echo esc_attr($secret_key); ?>"
+               value=""
+               autocomplete="new-password"
                class="regular-text"
-               placeholder="<?php esc_attr_e('iyzico Secret Key girin', 'kolai'); ?>" />
-        <p class="description"><?php esc_html_e('iyzico Secret Key\'inizi buraya girin.', 'kolai'); ?></p>
+               placeholder="<?php echo esc_attr($has_secret ? __('Kayitli — degistirmek icin yeni deger girin', 'kolai') : __('iyzico Secret Key girin', 'kolai')); ?>" />
+        <p class="description">
+            <?php
+            echo $has_secret
+                ? esc_html__('Bir gizli anahtar kayitli. Bos birakirsaniz mevcut anahtar korunur.', 'kolai')
+                : esc_html__('iyzico Secret Key\'inizi buraya girin.', 'kolai');
+            ?>
+        </p>
         <?php
     }
 
@@ -547,6 +586,7 @@ class Kolai_Settings {
         ?>
         <input type="text"
                name="<?php echo esc_attr($name); ?>"
+               id="<?php echo esc_attr('kolai_meta_key_' . $field); ?>"
                value="<?php echo esc_attr($value); ?>"
                class="regular-text"
                placeholder="<?php echo esc_attr($default); ?>" />
@@ -574,6 +614,7 @@ class Kolai_Settings {
         ?>
         <input type="text"
                name="<?php echo esc_attr($name); ?>"
+               id="<?php echo esc_attr('kolai_invoice_value_' . $canonical); ?>"
                value="<?php echo esc_attr($value); ?>"
                class="regular-text"
                placeholder="<?php echo esc_attr($default); ?>" />
@@ -606,15 +647,22 @@ class Kolai_Settings {
      * Render Secret Key field
      */
     public function render_secret_key_field() {
-        $secret_key = get_option('kolai_secret_key', '');
+        $has_secret = get_option('kolai_secret_key', '') !== '';
         ?>
-        <input type="password" 
-               name="kolai_secret_key" 
-               id="kolai_secret_key" 
-               value="<?php echo esc_attr($secret_key); ?>" 
-               class="regular-text" 
-               placeholder="<?php esc_attr_e('Secret Key girin', 'kolai'); ?>" />
-        <p class="description"><?php esc_html_e('Kolai Secret Key\'inizi buraya girin.', 'kolai'); ?></p>
+        <input type="password"
+               name="kolai_secret_key"
+               id="kolai_secret_key"
+               value=""
+               autocomplete="new-password"
+               class="regular-text"
+               placeholder="<?php echo esc_attr($has_secret ? __('Kayitli — degistirmek icin yeni deger girin', 'kolai') : __('Secret Key girin', 'kolai')); ?>" />
+        <p class="description">
+            <?php
+            echo $has_secret
+                ? esc_html__('Bir gizli anahtar kayitli. Bos birakirsaniz mevcut anahtar korunur.', 'kolai')
+                : esc_html__('Kolai Secret Key\'inizi buraya girin.', 'kolai');
+            ?>
+        </p>
         <?php
     }
 

@@ -28,21 +28,22 @@ class Kolai_Shipping_Service {
     /**
      * Get shipment options for given products and address.
      *
-     * @param array $product_ids
+     * @param array $products Each entry is either a numeric product id (legacy)
+     *                        or an object: { productId, variationId?, quantity? }.
      * @param array $address
      * @return array
      */
-    public function get_shipment_options($product_ids, $address) {
+    public function get_shipment_options($products, $address) {
         if (!$this->is_woocommerce_active()) {
             throw new Kolai_WooCommerce_Inactive_Exception();
         }
 
-        if (!is_array($product_ids) || empty($product_ids)) {
+        if (!is_array($products) || empty($products)) {
             throw new Kolai_Invalid_Product_List_Exception('Products list is required');
         }
 
         $destination = Kolai_Address::normalize_destination_minimal($address);
-        $package = $this->build_package($product_ids, $destination);
+        $package = $this->build_package($products, $destination);
 
         $this->prime_customer_context($destination);
         $rates = $this->get_rates_for_package($package);
@@ -80,23 +81,88 @@ class Kolai_Shipping_Service {
      * @return array
      */
     /**
-     * Build a shipping package for calculation.
+     * Normalize a products list into shipping lines with real quantities.
      *
-     * @param array $product_ids
-     * @param array $destination
-     * @return array
+     * Accepts both the legacy form (an array of numeric product ids) and the
+     * quantity-aware form (objects with productId/variationId/quantity), so a
+     * client can adopt quantities incrementally without breaking.
+     *
+     * @param array $products
+     * @return array<int,array{product_id:int,variation_id:int,quantity:int}>
      */
-    private function build_package($product_ids, $destination) {
-        $contents = array();
-        $contents_cost = 0.0;
-        $index = 0;
+    private function normalize_lines($products) {
+        $lines = array();
 
-        foreach ($product_ids as $product_id) {
-            if (!is_numeric($product_id)) {
+        foreach ($products as $entry) {
+            $variation_id = 0;
+            $quantity     = 1;
+
+            if (is_array($entry)) {
+                $product_id = 0;
+                foreach (array('productId', 'product_id', 'id') as $k) {
+                    if (isset($entry[$k]) && is_numeric($entry[$k])) {
+                        $product_id = (int) $entry[$k];
+                        break;
+                    }
+                }
+                foreach (array('variationId', 'variation_id') as $k) {
+                    if (isset($entry[$k]) && is_numeric($entry[$k])) {
+                        $variation_id = (int) $entry[$k];
+                        break;
+                    }
+                }
+                foreach (array('quantity', 'qty') as $k) {
+                    if (isset($entry[$k]) && is_numeric($entry[$k])) {
+                        $quantity = (int) $entry[$k];
+                        break;
+                    }
+                }
+            } elseif (is_numeric($entry)) {
+                $product_id = (int) $entry;
+            } else {
                 throw new Kolai_Invalid_Product_List_Exception('Product IDs must be numeric');
             }
 
-            $product = wc_get_product((int) $product_id);
+            if ($product_id <= 0) {
+                throw new Kolai_Invalid_Product_List_Exception('Product IDs must be numeric');
+            }
+            if ($quantity < 1) {
+                $quantity = 1;
+            }
+
+            $lines[] = array(
+                'product_id'   => $product_id,
+                'variation_id' => $variation_id,
+                'quantity'     => $quantity,
+            );
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Build a shipping package for calculation.
+     *
+     * Honors the real per-line quantity so quantity/weight-based methods price
+     * correctly and free-shipping minimums are evaluated against the true
+     * subtotal.
+     *
+     * @param array $products    Legacy id list or quantity-aware line objects.
+     * @param array $destination
+     * @return array
+     */
+    private function build_package($products, $destination) {
+        $lines = $this->normalize_lines($products);
+
+        $contents = array();
+        $contents_cost = 0.0;
+        $index = 0;
+        $decimals = function_exists('wc_get_price_decimals') ? wc_get_price_decimals() : 2;
+
+        foreach ($lines as $line) {
+            // Use the variation when present so its own price/weight are applied.
+            $lookup_id = $line['variation_id'] > 0 ? $line['variation_id'] : $line['product_id'];
+            $product = wc_get_product($lookup_id);
             if (!$product) {
                 throw new Kolai_Product_Not_Found_Exception();
             }
@@ -105,18 +171,20 @@ class Kolai_Shipping_Service {
                 continue;
             }
 
-            $price = (float) $product->get_price();
-            $contents_cost += $price;
+            $quantity   = $line['quantity'];
+            $price       = (float) $product->get_price();
+            $line_total = round($price * $quantity, $decimals);
+            $contents_cost += $line_total;
 
             $contents[$index] = array(
-                'key' => (string) $product->get_id(),
-                'product_id' => $product->get_id(),
-                'variation_id' => 0,
+                'key' => (string) $product->get_id() . '-' . $index,
+                'product_id' => $line['product_id'],
+                'variation_id' => $line['variation_id'],
                 'variation' => array(),
-                'quantity' => 1,
+                'quantity' => $quantity,
                 'data' => $product,
-                'line_total' => $price,
-                'line_subtotal' => $price,
+                'line_total' => $line_total,
+                'line_subtotal' => $line_total,
                 'line_tax' => 0,
                 'line_subtotal_tax' => 0,
             );
@@ -247,7 +315,10 @@ class Kolai_Shipping_Service {
 
         if (empty($rates)) {
             $zone_id = $zone ? $zone->get_id() : 0;
-            error_log(sprintf('[Kolai] No rates. Zone: %s Destination: %s', $zone_id, wp_json_encode($package['destination'])));
+            Kolai_Logger::warning('shipping', 'No shipping rates resolved for package', array(
+                'zone_id'     => $zone_id,
+                'destination' => $package['destination'],
+            ));
         }
 
         return $rates;
@@ -256,14 +327,14 @@ class Kolai_Shipping_Service {
     /**
      * Get a specific rate by id for given products and address.
      *
-     * @param array  $product_ids
+     * @param array  $products Legacy id list or quantity-aware line objects.
      * @param array  $address
      * @param string $rate_id
      * @return WC_Shipping_Rate
      */
-    public function get_rate_by_id($product_ids, $address, $rate_id) {
+    public function get_rate_by_id($products, $address, $rate_id) {
         $destination = Kolai_Address::normalize_destination($address);
-        $package = $this->build_package($product_ids, $destination);
+        $package = $this->build_package($products, $destination);
         $this->prime_customer_context($destination);
 
         $rates = $this->get_rates_for_package($package);

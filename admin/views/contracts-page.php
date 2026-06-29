@@ -190,10 +190,14 @@ $right_of_withdrawal_period = get_option('kolai_right_of_withdrawal_period', '')
 
         <h2><?php esc_html_e('Kullanilabilir Yer Tutucular', 'kolai'); ?></h2>
         <div id="kolai-placeholders-panel">
-            <button type="button" class="button" onclick="var panel = document.getElementById('kolai-placeholders-list'); panel.style.display = panel.style.display === 'none' ? 'block' : 'none';">
+            <button type="button"
+                    class="button"
+                    data-kolai-toggle="kolai-placeholders-list"
+                    aria-expanded="false"
+                    aria-controls="kolai-placeholders-list">
                 <?php esc_html_e('Yer Tutuculari Goster/Gizle', 'kolai'); ?>
             </button>
-            <div id="kolai-placeholders-list" style="display:none; margin-top:10px;">
+            <div id="kolai-placeholders-list" class="kolai-toggle-target" hidden style="margin-top:10px;">
                 <table class="widefat fixed striped">
                     <thead>
                         <tr>
