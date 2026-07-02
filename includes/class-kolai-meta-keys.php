@@ -34,6 +34,8 @@ class Kolai_Meta_Keys {
     const DEFAULTS = array(
         'invoice_type'          => 'billing_invoice_type',
         'tax_id'                => 'billing_tax_id',
+        'tckn'                  => 'billing_tax_id',
+        'vkn'                   => 'billing_tax_id',
         'tax_office'            => 'billing_tax_office',
         'payment_id'            => 'kolai_payment_id',
         'item_transactions'     => 'kolai_item_transactions',
@@ -67,6 +69,32 @@ class Kolai_Meta_Keys {
             }
         }
         return isset(self::DEFAULTS[$field]) ? self::DEFAULTS[$field] : $field;
+    }
+
+    /**
+     * Resolve the meta key for the tax id, split by invoice type.
+     *
+     * Personal invoices (TCKN) and company invoices (VKN) may be stored under
+     * separate keys. When the type-specific key is left blank, falls back to the
+     * general 'tax_id' key so existing single-key setups keep working unchanged.
+     *
+     * @param string $invoice_type 'personal' or 'company'.
+     * @return string
+     */
+    public static function tax_id_key($invoice_type) {
+        $invoice_type = strtolower(trim((string) $invoice_type));
+        $field = ($invoice_type === 'personal') ? 'tckn'
+               : (($invoice_type === 'company') ? 'vkn' : '');
+        if ($field !== '') {
+            $map = get_option(self::OPTION, array());
+            if (is_array($map) && isset($map[$field]) && is_string($map[$field])) {
+                $key = self::sanitize_meta_key($map[$field]);
+                if ($key !== '') {
+                    return $key;
+                }
+            }
+        }
+        return self::get('tax_id');
     }
 
     /**

@@ -394,7 +394,8 @@ class Kolai_Order_Service {
         if (isset($billing['taxId'])) {
             $tax_id = trim((string) $billing['taxId']);
             if ($tax_id !== '') {
-                $order->update_meta_data(Kolai_Meta_Keys::get('tax_id'), sanitize_text_field($tax_id));
+                $invoice_type = isset($billing['invoiceType']) ? $billing['invoiceType'] : '';
+                $order->update_meta_data(Kolai_Meta_Keys::tax_id_key($invoice_type), sanitize_text_field($tax_id));
             }
         }
 

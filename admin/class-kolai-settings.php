@@ -334,7 +334,9 @@ class Kolai_Settings {
 
         $meta_fields = array(
             'invoice_type'          => __('Fatura Tipi', 'kolai'),
-            'tax_id'                => __('Vergi / TC No', 'kolai'),
+            'tax_id'                => __('Vergi / TC No (genel)', 'kolai'),
+            'tckn'                  => __('TC Kimlik No (bireysel fatura)', 'kolai'),
+            'vkn'                   => __('Vergi No (kurumsal fatura)', 'kolai'),
             'tax_office'            => __('Vergi Dairesi', 'kolai'),
             'payment_id'            => __('iyzico Payment ID', 'kolai'),
             'item_transactions'     => __('Item Transactions', 'kolai'),
@@ -563,6 +565,7 @@ class Kolai_Settings {
     public function render_meta_map_section_callback() {
         echo '<p>' . esc_html__('Siparis verilerinin kaydedilecegi meta anahtar adlarini buradan ozellestirebilirsiniz. Bos birakirsaniz varsayilan anahtarlar kullanilir.', 'kolai') . '</p>';
         echo '<p><em>' . esc_html__('Not: Anahtar adini degistirmek yalnizca bundan sonra olusturulacak/guncellenecek siparisleri etkiler; mevcut siparislerdeki veriler eski anahtarda kalir.', 'kolai') . '</em></p>';
+        echo '<p><em>' . esc_html__('TC Kimlik No / Vergi No: doldurursaniz bireysel faturada TCKN, kurumsal faturada VKN ayri anahtarlara yazilir. Bos birakirsaniz her ikisi de "Vergi / TC No (genel)" anahtarina kaydedilir.', 'kolai') . '</em></p>';
     }
 
     /**
