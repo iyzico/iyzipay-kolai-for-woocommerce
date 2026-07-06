@@ -46,6 +46,9 @@ Request body zorunlu degildir. Bos body veya bos JSON gonderilebilir:
       "content": "<h1>Mesafeli Satis Sozlesmesi</h1><h2>MADDE 1 - TARAFLAR</h2><h3>1.1 SATICI</h3><p><strong>Unvan:</strong> Ornek Ticaret A.S.<br>...",
       "placeholders": {
         "{{buyer_name}}": "Alici adi",
+        "{{buyer_company_name}}": "Alici firma unvani",
+        "{{buyer_tax_id}}": "Alici VKN / TCKN",
+        "{{buyer_tax_office}}": "Alici vergi dairesi",
         "{{buyer_email}}": "Alici e-posta adresi",
         "{{buyer_phone}}": "Alici telefonu",
         "{{buyer_address}}": "Alici adresi",
@@ -63,6 +66,9 @@ Request body zorunlu degildir. Bos body veya bos JSON gonderilebilir:
       "content": "<h1>On Bilgilendirme Formu</h1><p>6502 sayili Tuketicinin Korunmasi Hakkinda Kanun ...",
       "placeholders": {
         "{{buyer_name}}": "Alici adi",
+        "{{buyer_company_name}}": "Alici firma unvani",
+        "{{buyer_tax_id}}": "Alici VKN / TCKN",
+        "{{buyer_tax_office}}": "Alici vergi dairesi",
         "{{buyer_email}}": "Alici e-posta adresi",
         "{{buyer_phone}}": "Alici telefonu",
         "{{buyer_address}}": "Alici adresi",
@@ -173,6 +179,9 @@ Asagidaki alanlar API yanitinda placeholder olarak korunur ve istemci tarafinda 
 | Yer Tutucu | Aciklama |
 |------------|----------|
 | `{{buyer_name}}` | Alici adi |
+| `{{buyer_company_name}}` | Alici firma unvani |
+| `{{buyer_tax_id}}` | Alici VKN / TCKN |
+| `{{buyer_tax_office}}` | Alici vergi dairesi |
 | `{{buyer_email}}` | Alici e-posta adresi |
 | `{{buyer_phone}}` | Alici telefonu |
 | `{{buyer_address}}` | Alici adresi |

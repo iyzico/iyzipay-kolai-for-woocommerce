@@ -36,6 +36,9 @@ class Kolai_Contract_Service {
     public function get_placeholder_definitions() {
         return array(
             '{{buyer_name}}'                 => 'Alici adi',
+            '{{buyer_company_name}}'         => 'Alici firma unvani',
+            '{{buyer_tax_id}}'               => 'Alici VKN / TCKN',
+            '{{buyer_tax_office}}'           => 'Alici vergi dairesi',
             '{{buyer_email}}'                => 'Alici e-posta adresi',
             '{{buyer_phone}}'                => 'Alici telefonu',
             '{{buyer_address}}'              => 'Alici adresi',
@@ -252,6 +255,9 @@ class Kolai_Contract_Service {
 <h3>1.2 ALICI</h3>
 <p>
 <strong>Ad Soyad:</strong> {{buyer_name}}<br>
+<strong>Firma Unvani:</strong> {{buyer_company_name}}<br>
+<strong>VKN / TCKN:</strong> {{buyer_tax_id}}<br>
+<strong>Vergi Dairesi:</strong> {{buyer_tax_office}}<br>
 <strong>Adres:</strong> {{buyer_address}}<br>
 <strong>Telefon:</strong> {{buyer_phone}}<br>
 <strong>E-posta:</strong> {{buyer_email}}
@@ -308,6 +314,9 @@ class Kolai_Contract_Service {
 <h2>2. ALICI BILGILERI</h2>
 <p>
 <strong>Ad Soyad:</strong> {{buyer_name}}<br>
+<strong>Firma Unvani:</strong> {{buyer_company_name}}<br>
+<strong>VKN / TCKN:</strong> {{buyer_tax_id}}<br>
+<strong>Vergi Dairesi:</strong> {{buyer_tax_office}}<br>
 <strong>Adres:</strong> {{buyer_address}}<br>
 <strong>Telefon:</strong> {{buyer_phone}}<br>
 <strong>E-posta:</strong> {{buyer_email}}
