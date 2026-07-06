@@ -98,10 +98,34 @@ class Kolai_Address {
 
         if ($include_contact) {
             $order_address['email'] = isset($buyer['email']) ? sanitize_email($buyer['email']) : '';
-            $order_address['phone'] = isset($buyer['phone']) ? sanitize_text_field($buyer['phone']) : '';
+            $order_address['phone'] = isset($buyer['phone']) ? self::normalize_phone($buyer['phone']) : '';
         }
 
         return $order_address;
+    }
+
+    /**
+     * Normalize a Turkish phone number to bare 10-digit form.
+     *
+     * Strips a leading +90 / 0090 / 90 country code or a leading 0, so that
+     * "+905355401122" is stored as "5355401122". Any input that is not a
+     * recognised TR mobile shape (10 digits after stripping) is returned as the
+     * sanitized original so foreign / malformed numbers are not silently mangled.
+     *
+     * @param string $phone
+     * @return string
+     */
+    private static function normalize_phone($phone) {
+        $sanitized = sanitize_text_field($phone);
+        $digits = preg_replace('/\D+/', '', $sanitized);
+
+        if (strlen($digits) === 12 && strpos($digits, '90') === 0) {
+            $digits = substr($digits, 2);
+        } elseif (strlen($digits) === 11 && strpos($digits, '0') === 0) {
+            $digits = substr($digits, 1);
+        }
+
+        return strlen($digits) === 10 ? $digits : $sanitized;
     }
 
     /**
