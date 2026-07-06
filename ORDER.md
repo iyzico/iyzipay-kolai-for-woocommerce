@@ -253,6 +253,9 @@ Opsiyonel olarak odeme bilgileri de gonderilebilir. Gonderildiginde bu alanlar s
 {
   "orderStatus": "processing",
   "paymentId": "123456789",
+  "price": 100.00,
+  "paidPrice": 110.00,
+  "installment": 3,
   "itemTransactions": [
     {
       "itemId": "7ab0ee59-18b4-4e30-9ca8-04197bb34127",
@@ -268,6 +271,10 @@ Opsiyonel olarak odeme bilgileri de gonderilebilir. Gonderildiginde bu alanlar s
 Not: Odeme alanlari opsiyoneldir ve `orderStatus` ile birlikte gonderilebilir.
 - `paymentId`: `kolai_payment_id` order meta'sina kaydedilir.
 - `itemTransactions`: normalize edilerek JSON olarak `kolai_item_transactions` order meta'sina kaydedilir. Her bir kalem `itemId`, `paymentTransactionId`, `transactionStatus`, `price`, `paidPrice` alanlarini icerir.
+- `paidPrice` / `installment`: gonderildiginde siparisin toplami gercekten tahsil edilen `paidPrice` ile eslenir. `paidPrice` ile siparisin o anki toplami arasindaki fark bir fee satiri olarak eklenir:
+  - Fark **pozitif** ise **Vade Farki** (taksit komisyonu) olarak, **negatif** ise **Indirim** olarak kaydedilir. Fark KDV dahil (brüt) kabul edilir ve mevcut vergi oranlarina orantili dagitilir.
+  - `installment` (> 1) `kolai_installment_count`, fark tutari ise `kolai_installment_fee` order meta'sina yazilir. Bu iki anahtar **Ayarlar › Meta Alan Anahtarlari** altindan degistirilebilir (bkz. [CONTRACT/meta ayarlari]).
+  - Idempotent: ayni `paidPrice` ile tekrar gonderildiginde onceki vade farki satiri silinip yeniden hesaplanir; fee'ler ustuste eklenmez.
 
 ### Response (success)
 

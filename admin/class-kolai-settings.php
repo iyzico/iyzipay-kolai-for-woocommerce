@@ -339,6 +339,8 @@ class Kolai_Settings {
             'vkn'                   => __('Vergi No (kurumsal fatura)', 'kolai'),
             'tax_office'            => __('Vergi Dairesi', 'kolai'),
             'payment_id'            => __('iyzico Payment ID', 'kolai'),
+            'installment_count'     => __('Taksit Sayisi', 'kolai'),
+            'installment_fee'       => __('Vade Farki / Indirim', 'kolai'),
             'item_transactions'     => __('Item Transactions', 'kolai'),
             'refunded_transactions' => __('Iade Kayitlari', 'kolai'),
             'cancel_result'         => __('Iptal Sonucu', 'kolai'),

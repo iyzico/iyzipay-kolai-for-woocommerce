@@ -38,6 +38,8 @@ class Kolai_Meta_Keys {
         'vkn'                   => 'billing_tax_id',
         'tax_office'            => 'billing_tax_office',
         'payment_id'            => 'kolai_payment_id',
+        'installment_count'     => 'kolai_installment_count',
+        'installment_fee'       => 'kolai_installment_fee',
         'item_transactions'     => 'kolai_item_transactions',
         'refunded_transactions' => 'kolai_refunded_transactions',
         'refund_operations'     => 'kolai_refund_operations',

@@ -229,6 +229,10 @@ class Kolai_Order_Service {
         // downstream integrations observe them on the order.
         $this->apply_payment_meta($order, $payload);
 
+        // Reconcile the total with the charged paidPrice (installment interest or
+        // discount) before payment_complete() so emails/totals reflect it.
+        $this->apply_installment_adjustment($order, $payload);
+
         $payment_id    = isset($payload['paymentId']) ? trim((string) $payload['paymentId']) : '';
         $paid_statuses = function_exists('wc_get_is_paid_statuses')
             ? wc_get_is_paid_statuses()
@@ -525,45 +529,9 @@ class Kolai_Order_Service {
             throw new Kolai_Discount_Exceeds_Total_Exception();
         }
 
-        // The incoming discountAmount is tax-inclusive (gross). To keep the tax
-        // report consistent under tax-inclusive (KDV) pricing, split the discount
-        // into a net amount plus per-rate negative tax, prorated against the
-        // order's existing tax lines. When the store has no tax, this naturally
-        // degrades to a plain non-taxable negative fee.
-        $order_tax_lines = $order->get_taxes();
-        $ratio = ($total_before > 0) ? ($discount / $total_before) : 0.0;
-
-        $fee_taxes = array();
-        $discount_tax_total = 0.0;
-        foreach ($order_tax_lines as $tax_item) {
-            $rate_id  = $tax_item->get_rate_id();
-            $line_tax = (float) $tax_item->get_tax_total() + (float) $tax_item->get_shipping_tax_total();
-            if ($line_tax === 0.0) {
-                continue;
-            }
-            $alloc = round(-1 * $line_tax * $ratio, 2);
-            $fee_taxes[$rate_id] = $alloc;
-            $discount_tax_total += $alloc;
-        }
-
-        // fee net (excl tax) = -(gross discount - |allocated tax|).
-        // $discount_tax_total is negative, so this subtracts the tax portion.
-        $fee_net = round(-1 * $discount - $discount_tax_total, 2);
-
-        $fee = new WC_Order_Item_Fee();
-        $fee->set_name('Discount');
-        $fee->set_amount($fee_net);
-        $fee->set_total($fee_net);
-
-        if (!empty($fee_taxes)) {
-            $fee->set_tax_status('taxable');
-            $fee->set_taxes(array('total' => $fee_taxes));
-        } else {
-            $fee->set_tax_status('none');
-            $fee->set_taxes(array());
-        }
-
-        $order->add_item($fee);
+        // discountAmount is a tax-inclusive (gross) reduction — apply it as a
+        // negative gross adjustment (see build_gross_fee_item for the tax split).
+        $order->add_item($this->build_gross_fee_item($order, -$discount, 'Discount'));
         // Pass false so calculate_totals does NOT recompute taxes and overwrite
         // the negative tax we allocated on the discount fee above.
         $order->calculate_totals(false);
@@ -582,5 +550,126 @@ class Kolai_Order_Service {
                 'drift'        => $drift,
             ));
         }
+    }
+
+    /**
+     * Build a tax-inclusive fee item for a signed gross amount.
+     *
+     * The gross value is treated as tax-inclusive (KDV). The tax portion is
+     * prorated across the order's existing tax lines so the tax report stays
+     * consistent; the fee net = gross - allocated tax. Positive gross raises the
+     * order total, negative lowers it. With no tax lines it degrades to a plain
+     * non-taxable fee. Caller must add_item() it and calculate_totals(false).
+     *
+     * @param WC_Order $order
+     * @param float    $gross Signed tax-inclusive amount.
+     * @param string   $name  Fee line label.
+     * @return WC_Order_Item_Fee
+     */
+    private function build_gross_fee_item($order, $gross, $name) {
+        $total_before = (float) $order->get_total();
+        $ratio = ($total_before != 0.0) ? ($gross / $total_before) : 0.0;
+
+        $fee_taxes = array();
+        $tax_total = 0.0;
+        foreach ($order->get_taxes() as $tax_item) {
+            $line_tax = (float) $tax_item->get_tax_total() + (float) $tax_item->get_shipping_tax_total();
+            if ($line_tax === 0.0) {
+                continue;
+            }
+            $alloc = round($line_tax * $ratio, 2);
+            $fee_taxes[$tax_item->get_rate_id()] = $alloc;
+            $tax_total += $alloc;
+        }
+
+        $fee_net = round($gross - $tax_total, 2);
+
+        $fee = new WC_Order_Item_Fee();
+        $fee->set_name($name);
+        $fee->set_amount($fee_net);
+        $fee->set_total($fee_net);
+
+        if (!empty($fee_taxes)) {
+            $fee->set_tax_status('taxable');
+            $fee->set_taxes(array('total' => $fee_taxes));
+        } else {
+            $fee->set_tax_status('none');
+            $fee->set_taxes(array());
+        }
+
+        return $fee;
+    }
+
+    /**
+     * Reconcile the order total with the paid price after an installment payment.
+     *
+     * The PATCH payload carries the actually-charged `paidPrice` and the
+     * `installment` count. The difference between paidPrice and the order's
+     * current base total is the installment interest ("vade farki", positive) or,
+     * when the buyer paid less, a discount ("indirim", negative). It is recorded
+     * as a fee line so get_total() equals paidPrice, plus meta under the
+     * configurable installment_count / installment_fee keys.
+     *
+     * Idempotent: any previously-added installment fee is stripped and the total
+     * recomputed before measuring the difference, so repeated PATCHes with the
+     * same paidPrice converge instead of stacking fees.
+     *
+     * @param WC_Order $order
+     * @param array    $payload
+     * @return void
+     */
+    private function apply_installment_adjustment($order, $payload) {
+        if (!isset($payload['paidPrice']) || !is_numeric($payload['paidPrice'])) {
+            return;
+        }
+        $paid_price = round((float) $payload['paidPrice'], 2);
+        if ($paid_price <= 0) {
+            return;
+        }
+        $installment = isset($payload['installment']) ? (int) $payload['installment'] : 1;
+
+        // Strip any prior installment fee and recalc so get_total() reflects the
+        // base price (products + shipping + discount) without our adjustment.
+        $removed = false;
+        foreach ($order->get_items('fee') as $item_id => $fee_item) {
+            if ($fee_item->get_meta('_kolai_installment_fee') === 'yes') {
+                $order->remove_item($item_id);
+                $removed = true;
+            }
+        }
+        if ($removed) {
+            $order->calculate_totals(false);
+        }
+
+        if ($installment > 1) {
+            $order->update_meta_data(Kolai_Meta_Keys::get('installment_count'), $installment);
+        }
+
+        $base_total = round((float) $order->get_total(), 2);
+        $diff = round($paid_price - $base_total, 2);
+
+        if ($diff === 0.0) {
+            $order->delete_meta_data(Kolai_Meta_Keys::get('installment_fee'));
+            return;
+        }
+
+        // A negative adjustment (indirim) must not drive the total below zero.
+        if ($diff < 0 && abs($diff) > $base_total) {
+            Kolai_Logger::warning('order', 'Installment adjustment exceeds order total; skipped', array(
+                'order_id'   => $order->get_id(),
+                'paid_price' => $paid_price,
+                'base_total' => $base_total,
+                'diff'       => $diff,
+            ));
+            return;
+        }
+
+        $name = ($diff > 0) ? __('Vade Farki', 'kolai') : __('Indirim', 'kolai');
+        $fee = $this->build_gross_fee_item($order, $diff, $name);
+        $fee->add_meta_data('_kolai_installment_fee', 'yes', true);
+        $order->add_item($fee);
+        $order->calculate_totals(false);
+
+        $order->update_meta_data(Kolai_Meta_Keys::get('installment_fee'), $diff);
     }
 }
