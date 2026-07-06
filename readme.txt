@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -71,6 +71,11 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.0 =
+* Installment reconciliation: `PATCH /orders/{orderId}` now accepts `price`, `paidPrice` and `installment`. When `paidPrice` is sent, the order total is reconciled to the actually-charged amount — the difference against the order's current total is added as a tax-aware fee line: **installment interest** ("Vade Farkı") when positive, **discount** ("İndirim") when negative. The installment count and fee amount are written to order meta under configurable keys (`kolai_installment_count`, `kolai_installment_fee`), renameable from **Kolai → Meta Alan Anahtarları**. The reconciliation is idempotent (repeat PATCHes with the same `paidPrice` do not stack fees).
+* Contracts: buyer company / tax placeholders added to the distance-sales and pre-information templates — `{{buyer_company_name}}`, `{{buyer_tax_id}}` (VKN/TCKN) and `{{buyer_tax_office}}`.
+* Orders: buyer phone from the REST payload is normalized to bare 10-digit TR form on order creation (e.g. `+905355401122` → `5355401122`); non-TR / malformed numbers are stored unchanged.
+
 = 1.7.0 =
 Security & reliability hardening pass (post-review remediation).
 
@@ -111,6 +116,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.0 =
+Adds installment-fee/discount reconciliation on order update (paidPrice → order total) with configurable meta keys, buyer company/tax placeholders in contracts, and Turkish buyer-phone normalization. To use installment reconciliation, send `paidPrice` (and `installment`) on `PATCH /orders/{orderId}`.
 
 = 1.7.0 =
 Security & reliability hardening: atomic/recoverable refunds, fail-closed authentication with replay protection, payment_complete() lifecycle, quantity-aware shipping, active-only sale prices and request-log PII redaction. After upgrading, ensure BOTH the Kolai API key and secret are set (requests are now rejected if the secret is empty).
