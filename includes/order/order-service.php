@@ -664,7 +664,14 @@ class Kolai_Order_Service {
             return;
         }
 
-        $name = ($diff > 0) ? __('Vade Farki', 'kolai') : __('Indirim', 'kolai');
+        if ($diff > 0) {
+            $name = ($installment > 1)
+                /* translators: %d: installment count */
+                ? sprintf(__('%d Taksit icin Vade Farki', 'kolai'), $installment)
+                : __('Vade Farki', 'kolai');
+        } else {
+            $name = __('Indirim', 'kolai');
+        }
         $fee = $this->build_gross_fee_item($order, $diff, $name);
         $fee->add_meta_data('_kolai_installment_fee', 'yes', true);
         $order->add_item($fee);
