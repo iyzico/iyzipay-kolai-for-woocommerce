@@ -96,6 +96,39 @@ POST /wp-json/kolai/v1/orders
 ```
 
 Not: `discountAmount` opsiyoneldir. Gonderildiginde `0.00` dan buyuk olmalidir.
+
+Not: Adres alanlari (hem `billingAddress` hem `shippingAddress` icin ayni):
+- `countryId`: ulke kodu (`TR`). Zorunlu.
+- `cityId`: **il** plaka kodu; WooCommerce `state` alanina yazilir (`06` -> `TR06`). Zorunlu. Tek haneli plakalar da kabul edilir (`6` -> `TR06`).
+- `districtId`: **ilce** adi; WooCommerce `city` alanina yazilir (`Cankaya`). Gonderilmezse `city` **bos kalir**.
+- `addressLine`: **sadece acik adres** (mahalle / sokak / no / daire). WooCommerce `address_1` alanina **oldugu gibi** yazilir; icine il/ilce **konmamalidir**, yoksa adreste tekrar eder.
+- `postcode`: posta kodu (opsiyonel).
+
+> **Onemli:** iyzico "Pay with iyzico" (PWI) adresi ilceyi ayri bir alan olarak vermez; ilce sadece serbest metnin icinde gelir. Bu yuzden caller, ilceyi `districtId` olarak ayirmali ve `addressLine`'i il/ilce icermeyecek sekilde temiz gondermelidir.
+
+Yanlis (city bos kalir, `address_1` il/ilce ile kirlenir):
+
+```json
+{
+  "cityId": "06",
+  "addressLine": "Akpinar Mah. Cankaya sokak 1 No: 2 Daire: 3 Kat: Cankaya Ankara /"
+}
+```
+
+Dogru (beklenen):
+
+```json
+{
+  "countryId": "TR",
+  "cityId": "06",
+  "districtId": "Cankaya",
+  "postcode": "06550",
+  "addressLine": "Akpinar Mah. Cankaya sokak 1 No: 2 Daire: 3 Kat"
+}
+```
+
+Sonuc: `state` = `TR06`, `city` = `Cankaya`, `address_1` = `Akpinar Mah. Cankaya sokak 1 No: 2 Daire: 3 Kat`.
+
 Not: `billingAddress` icinde opsiyonel fatura alanlari:
 - `invoiceType`: `personal` veya `company` (varsayilan `personal`)
 - `companyName`, `taxId`, `taxOffice` alanlari opsiyoneldir

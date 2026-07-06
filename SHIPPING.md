@@ -49,7 +49,9 @@ POST /wp-json/kolai/v1/shipment-options
 
 Adres alanlari WooCommerce tarafinda su sekilde map edilir:
 - `countryId` -> `country`
-- `cityId` -> `state` (il/province). TR icin `34` gibi numeric degerler otomatik `TR34` olarak normalize edilir.
+- `cityId` -> `state` (il/province). TR icin numeric plaka degerleri iki haneli sifir dolgulu koda normalize edilir (`34` -> `TR34`, `6` -> `TR06`).
+
+> Not: Bu endpoint kargo teklifi icin yalnizca `countryId` + `cityId` (il) kullanir; ilce (`districtId`) ve acik adres (`addressLine`) gerekmez. Tam adres alanlari ve ilce/il ayrimi icin `POST /orders` (ORDER.md) sozlesmesine bakin.
 
 ### Response (success)
 

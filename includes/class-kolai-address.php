@@ -29,9 +29,9 @@ class Kolai_Address {
         $state = sanitize_text_field($address['cityId']);
         $city = isset($address['districtId']) ? sanitize_text_field($address['districtId']) : '';
 
-        // WooCommerce TR state codes are usually like TR34. Normalize if numeric.
+        // WooCommerce TR state codes are zero-padded 2-digit: TR01..TR81.
         if ($country === 'TR' && preg_match('/^\d+$/', $state)) {
-            $state = 'TR' . $state;
+            $state = 'TR' . str_pad($state, 2, '0', STR_PAD_LEFT);
         }
 
         return array(
@@ -58,9 +58,9 @@ class Kolai_Address {
         $country = sanitize_text_field($address['countryId']);
         $state = sanitize_text_field($address['cityId']);
 
-        // WooCommerce TR state codes are usually like TR34. Normalize if numeric.
+        // WooCommerce TR state codes are zero-padded 2-digit: TR01..TR81.
         if ($country === 'TR' && preg_match('/^\d+$/', $state)) {
-            $state = 'TR' . $state;
+            $state = 'TR' . str_pad($state, 2, '0', STR_PAD_LEFT);
         }
 
         return array(
