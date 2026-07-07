@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -71,6 +71,9 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.2 =
+* Installment fee / discount total fix: the "Vade Farkı" (installment interest) and "İndirim" (discount) lines are now added as **non-taxable** fees carrying the full gross amount, so the WooCommerce order total matches the iyzico `paidPrice` exactly. Previously, when these were treated as taxable, the fee's KDV was left off the order total and it came out short by exactly the fee tax.
+
 = 1.8.1 =
 * Installment fee line: when an installment count is known, the interest line is now labelled **"{n} Taksit için Vade Farkı"** (e.g. "6 Taksit için Vade Farkı") instead of a bare "Vade Farkı"; single-payment orders and discount lines are unchanged.
 
@@ -119,6 +122,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.2 =
+Fixes installment-fee/discount orders whose total was short by the fee's tax; the interest/discount line is now a non-taxable fee so the order total matches the charged paidPrice.
 
 = 1.8.1 =
 Installment interest line now shows the installment count ("{n} Taksit için Vade Farkı").
