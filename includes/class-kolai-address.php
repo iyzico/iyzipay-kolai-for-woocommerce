@@ -27,7 +27,10 @@ class Kolai_Address {
 
         $country = sanitize_text_field($address['countryId']);
         $state = sanitize_text_field($address['cityId']);
-        $city = isset($address['districtId']) ? sanitize_text_field($address['districtId']) : '';
+        // iyzico sends the district (ilce) as `district`; older callers / docs
+        // use `districtId`. Accept both so `city` is not silently left empty.
+        $district = $address['district'] ?? $address['districtId'] ?? '';
+        $city = sanitize_text_field($district);
 
         // WooCommerce TR state codes are zero-padded 2-digit: TR01..TR81.
         if ($country === 'TR' && preg_match('/^\d+$/', $state)) {

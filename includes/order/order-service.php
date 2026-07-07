@@ -91,6 +91,24 @@ class Kolai_Order_Service {
 
             $order->set_address(Kolai_Address::build_order_address($billing, $buyer, true), 'billing');
             $order->set_address(Kolai_Address::build_order_address($shipping, $buyer, false), 'shipping');
+
+            // Address mapping diagnostic: caller sends cityId (-> state) and
+            // districtId (-> city). Recurring "city empty" / "wrong state"
+            // complaints trace to the caller omitting districtId or sending a
+            // cityId whose plate code doesn't match the address. Log the mapped
+            // il/ilce (no street/name/phone PII) so we can see what arrived.
+            Kolai_Logger::info('order', 'Address mapped', array(
+                'order_id'            => $order->get_id(),
+                'billing_cityId'      => isset($billing['cityId']) ? sanitize_text_field($billing['cityId']) : null,
+                'billing_state'       => $order->get_billing_state(),
+                'billing_district'    => $billing['district'] ?? $billing['districtId'] ?? null,
+                'billing_city'        => $order->get_billing_city(),
+                'shipping_cityId'     => isset($shipping['cityId']) ? sanitize_text_field($shipping['cityId']) : null,
+                'shipping_state'      => $order->get_shipping_state(),
+                'shipping_district'   => $shipping['district'] ?? $shipping['districtId'] ?? null,
+                'shipping_city'       => $order->get_shipping_city(),
+            ));
+
             $this->apply_billing_invoice_meta($order, $billing);
 
             foreach ($items as $item) {
