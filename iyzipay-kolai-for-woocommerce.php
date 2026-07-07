@@ -3,7 +3,7 @@
  * Plugin Name: iyzico Kolai for WooCommerce
  * Plugin URI: https://github.com/iyzico/iyzipay-kolai-for-woocommerce
  * Description: Kolai API entegrasyonu için ayarlar modülü
- * Version: 1.8.2
+ * Version: 1.8.4
  * Author: iyzico
  * Author URI: https://www.iyzico.com
  * License: GPLv2 or later
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('KOLAI_VERSION', '1.8.2');
+define('KOLAI_VERSION', '1.8.4');
 define('KOLAI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('KOLAI_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('KOLAI_PLUGIN_BASENAME', plugin_basename(__FILE__));

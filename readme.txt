@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.2
+Stable tag: 1.8.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -71,9 +71,15 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.4 =
+* Address district field: iyzico now sends the district (ilçe) as `town`. The order `city` is now read from `town`, falling back to `district` then `districtId` (first non-empty), so it stays populated across the field rename.
+* City fallback: when no district is provided at all, `city` now falls back to the province (il) name from WooCommerce's Turkey state list (e.g. `TR01` → "Adana") instead of being left empty.
+
+= 1.8.3 =
+* Address district fix: the order billing/shipping **city** was always empty because iyzico sends the district (ilçe) in a field named `district`, while the plugin only read `districtId`. Both names are now accepted, so `city` is populated correctly. Order creation also logs the mapped `cityId → state` / district → city (il/ilçe only, no street/contact PII) for diagnosing address issues.
+
 = 1.8.2 =
 * Installment fee / discount total fix: the "Vade Farkı" (installment interest) and "İndirim" (discount) lines are now added as **non-taxable** fees carrying the full gross amount, so the WooCommerce order total matches the iyzico `paidPrice` exactly. Previously, when these were treated as taxable, the fee's KDV was left off the order total and it came out short by exactly the fee tax.
-* Address district fix: the order billing/shipping **city** was always empty because iyzico sends the district (ilçe) in a field named `district`, while the plugin only read `districtId`. Both names are now accepted, so `city` is populated correctly. Order creation also logs the mapped `cityId → state` / district → city (il/ilçe only, no street/contact PII) for diagnosing address issues.
 
 = 1.8.1 =
 * Installment fee line: when an installment count is known, the interest line is now labelled **"{n} Taksit için Vade Farkı"** (e.g. "6 Taksit için Vade Farkı") instead of a bare "Vade Farkı"; single-payment orders and discount lines are unchanged.
@@ -124,8 +130,14 @@ Security & reliability hardening pass (post-review remediation).
 
 == Upgrade Notice ==
 
+= 1.8.4 =
+iyzico renamed the district field to `town`; the order city now reads `town` (falling back to `district` / `districtId`) so it stays populated.
+
+= 1.8.3 =
+Populates the order city from iyzico's `district` field (previously only `districtId` was read, leaving city empty).
+
 = 1.8.2 =
-Fixes installment-fee/discount order totals (non-taxable fee so the total matches the charged paidPrice) and populates the order city from iyzico's `district` field (previously only `districtId` was read, leaving city empty).
+Fixes installment-fee/discount order totals: the interest/discount line is now a non-taxable fee so the total matches the charged paidPrice.
 
 = 1.8.1 =
 Installment interest line now shows the installment count ("{n} Taksit için Vade Farkı").

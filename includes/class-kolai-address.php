@@ -27,14 +27,32 @@ class Kolai_Address {
 
         $country = sanitize_text_field($address['countryId']);
         $state = sanitize_text_field($address['cityId']);
-        // iyzico sends the district (ilce) as `district`; older callers / docs
-        // use `districtId`. Accept both so `city` is not silently left empty.
-        $district = $address['district'] ?? $address['districtId'] ?? '';
+        // iyzico now sends the district (ilce) as `town`; earlier it was
+        // `district`, and the original contract used `districtId`. Take the first
+        // non-empty of the three (handles the transition and empty-string fields)
+        // so `city` is not silently left empty.
+        $district = '';
+        foreach (array('town', 'district', 'districtId') as $key) {
+            if (!empty($address[$key])) {
+                $district = $address[$key];
+                break;
+            }
+        }
         $city = sanitize_text_field($district);
 
         // WooCommerce TR state codes are zero-padded 2-digit: TR01..TR81.
         if ($country === 'TR' && preg_match('/^\d+$/', $state)) {
             $state = 'TR' . str_pad($state, 2, '0', STR_PAD_LEFT);
+        }
+
+        // No district? Fall back to the province (il) name from WooCommerce's TR
+        // state list (TR01 -> "Adana") so `city` is not left empty. Best-effort:
+        // the il name is coarser than the real ilce, but better than a blank.
+        if ($city === '' && $country === 'TR' && function_exists('WC')) {
+            $states = WC()->countries->get_states('TR');
+            if (!empty($states[$state])) {
+                $city = $states[$state];
+            }
         }
 
         return array(

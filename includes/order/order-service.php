@@ -101,11 +101,11 @@ class Kolai_Order_Service {
                 'order_id'            => $order->get_id(),
                 'billing_cityId'      => isset($billing['cityId']) ? sanitize_text_field($billing['cityId']) : null,
                 'billing_state'       => $order->get_billing_state(),
-                'billing_district'    => $billing['district'] ?? $billing['districtId'] ?? null,
+                'billing_district'    => $billing['town'] ?? $billing['district'] ?? $billing['districtId'] ?? null,
                 'billing_city'        => $order->get_billing_city(),
                 'shipping_cityId'     => isset($shipping['cityId']) ? sanitize_text_field($shipping['cityId']) : null,
                 'shipping_state'      => $order->get_shipping_state(),
-                'shipping_district'   => $shipping['district'] ?? $shipping['districtId'] ?? null,
+                'shipping_district'   => $shipping['town'] ?? $shipping['district'] ?? $shipping['districtId'] ?? null,
                 'shipping_city'       => $order->get_shipping_city(),
             ));
 
