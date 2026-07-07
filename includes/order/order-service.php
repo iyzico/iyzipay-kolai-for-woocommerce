@@ -529,11 +529,10 @@ class Kolai_Order_Service {
             throw new Kolai_Discount_Exceeds_Total_Exception();
         }
 
-        // discountAmount is a tax-inclusive (gross) reduction — apply it as a
-        // negative gross adjustment (see build_gross_fee_item for the tax split).
-        $order->add_item($this->build_gross_fee_item($order, -$discount, 'Discount'));
-        // Pass false so calculate_totals does NOT recompute taxes and overwrite
-        // the negative tax we allocated on the discount fee above.
+        // discountAmount is a tax-inclusive (gross) reduction, applied as a
+        // negative NON-taxable fee: the full gross comes off the order total
+        // without splitting out KDV (matches the vade farki treatment).
+        $order->add_item($this->build_gross_fee_item(-$discount, 'Discount'));
         $order->calculate_totals(false);
 
         // Invariant: the order total must drop by exactly the requested discount.
@@ -553,49 +552,24 @@ class Kolai_Order_Service {
     }
 
     /**
-     * Build a tax-inclusive fee item for a signed gross amount.
+     * Build a non-taxable fee item for a signed gross amount.
      *
-     * The gross value is treated as tax-inclusive (KDV). The tax portion is
-     * prorated across the order's existing tax lines so the tax report stays
-     * consistent; the fee net = gross - allocated tax. Positive gross raises the
-     * order total, negative lowers it. With no tax lines it degrades to a plain
-     * non-taxable fee. Caller must add_item() it and calculate_totals(false).
+     * The full gross is added to the order total without splitting out KDV, so
+     * get_total() moves by exactly $gross. Positive raises the total (vade
+     * farki), negative lowers it (indirim). Caller must add_item() it and
+     * calculate_totals(false).
      *
-     * @param WC_Order $order
-     * @param float    $gross Signed tax-inclusive amount.
-     * @param string   $name  Fee line label.
+     * @param float  $gross Signed amount.
+     * @param string $name  Fee line label.
      * @return WC_Order_Item_Fee
      */
-    private function build_gross_fee_item($order, $gross, $name) {
-        $total_before = (float) $order->get_total();
-        $ratio = ($total_before != 0.0) ? ($gross / $total_before) : 0.0;
-
-        $fee_taxes = array();
-        $tax_total = 0.0;
-        foreach ($order->get_taxes() as $tax_item) {
-            $line_tax = (float) $tax_item->get_tax_total() + (float) $tax_item->get_shipping_tax_total();
-            if ($line_tax === 0.0) {
-                continue;
-            }
-            $alloc = round($line_tax * $ratio, 2);
-            $fee_taxes[$tax_item->get_rate_id()] = $alloc;
-            $tax_total += $alloc;
-        }
-
-        $fee_net = round($gross - $tax_total, 2);
-
+    private function build_gross_fee_item($gross, $name) {
         $fee = new WC_Order_Item_Fee();
         $fee->set_name($name);
-        $fee->set_amount($fee_net);
-        $fee->set_total($fee_net);
-
-        if (!empty($fee_taxes)) {
-            $fee->set_tax_status('taxable');
-            $fee->set_taxes(array('total' => $fee_taxes));
-        } else {
-            $fee->set_tax_status('none');
-            $fee->set_taxes(array());
-        }
+        $fee->set_amount(round($gross, 2));
+        $fee->set_total(round($gross, 2));
+        $fee->set_tax_status('none');
+        $fee->set_taxes(array());
 
         return $fee;
     }
@@ -672,7 +646,9 @@ class Kolai_Order_Service {
         } else {
             $name = __('Indirim', 'kolai');
         }
-        $fee = $this->build_gross_fee_item($order, $diff, $name);
+        // Vade farki is a non-taxable fee: the full gross lands on the order total
+        // (matching iyzico paidPrice); its KDV is not tracked in WC tax reports.
+        $fee = $this->build_gross_fee_item($diff, $name);
         $fee->add_meta_data('_kolai_installment_fee', 'yes', true);
         $order->add_item($fee);
         $order->calculate_totals(false);
