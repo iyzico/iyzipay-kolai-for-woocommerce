@@ -180,6 +180,32 @@ class Kolai_Settings {
             array('label_for' => 'kolai_iyzico_environment')
         );
 
+        // Shipping method toggles — scope: only the kolai /shipment-options endpoint.
+        register_setting(
+            'kolai_settings_group',
+            'kolai_shipment_method_toggles',
+            array(
+                'type' => 'array',
+                'sanitize_callback' => array($this, 'sanitize_shipment_method_toggles'),
+                'default' => array(),
+            )
+        );
+
+        add_settings_section(
+            'kolai_shipment_section',
+            __('Kargo Yontemleri (iyzico)', 'kolai'),
+            array($this, 'render_shipment_section_callback'),
+            'kolai-settings'
+        );
+
+        add_settings_field(
+            'kolai_shipment_method_toggles',
+            __('Yontemler', 'kolai'),
+            array($this, 'render_shipment_toggles_field'),
+            'kolai-settings',
+            'kolai_shipment_section'
+        );
+
         // Seller info settings
         register_setting(
             'kolai_contracts_group',
@@ -411,6 +437,31 @@ class Kolai_Settings {
     }
 
     /**
+     * Sanitize the shipping-method toggle map.
+     *
+     * Stored as { "<instance_id>": "1" | "0" }; "0" hides the method from the
+     * kolai /shipment-options endpoint only. Missing keys default to enabled,
+     * so a fresh install (option absent) returns every method as before.
+     *
+     * @param mixed $input
+     * @return array<string,string>
+     */
+    public function sanitize_shipment_method_toggles($input) {
+        $clean = array();
+        if (!is_array($input)) {
+            return $clean;
+        }
+        foreach ($input as $instance_id => $value) {
+            $key = (string) absint($instance_id);
+            if ($key === '0') {
+                continue; // invalid / non-instance key
+            }
+            $clean[$key] = ($value === '1' || $value === 1) ? '1' : '0';
+        }
+        return $clean;
+    }
+
+    /**
      * Sanitize a checkbox/boolean value (returns 1 or 0).
      *
      * @param mixed $value
@@ -560,7 +611,69 @@ class Kolai_Settings {
         <p class="description"><?php esc_html_e('Test icin Sandbox, canli islemler icin Production secin.', 'kolai'); ?></p>
         <?php
     }
-    
+
+    /**
+     * Render the shipping-methods section description.
+     */
+    public function render_shipment_section_callback() {
+        echo '<p>' . esc_html__('Bu liste yalnizca iyzico /shipment-options ucunu etkiler; WooCommerce odeme (checkout) akisi degismez. Isaretli yontemler uca cikar.', 'kolai') . '</p>';
+    }
+
+    /**
+     * Render one enable/disable checkbox per active WooCommerce shipping method,
+     * grouped by zone. Uses the hidden+checkbox idiom so an unchecked box still
+     * submits "0" (WordPress drops unchecked checkboxes from POST otherwise).
+     */
+    public function render_shipment_toggles_field() {
+        if (!class_exists('WC_Shipping_Zones')) {
+            echo '<p>' . esc_html__('WooCommerce aktif degil; kargo yontemleri listelenemiyor.', 'kolai') . '</p>';
+            return;
+        }
+
+        $toggles = get_option('kolai_shipment_method_toggles', array());
+        if (!is_array($toggles)) {
+            $toggles = array();
+        }
+
+        // Same enumeration as shipping-service.php: real zones + Rest of the World (0).
+        $zone_ids = array();
+        foreach (WC_Shipping_Zones::get_zones() as $zone_data) {
+            $zone_ids[] = isset($zone_data['zone_id']) ? $zone_data['zone_id'] : $zone_data['id'];
+        }
+        $zone_ids[] = 0;
+
+        $rendered_any = false;
+        foreach ($zone_ids as $zone_id) {
+            $zone = WC_Shipping_Zones::get_zone($zone_id);
+            if (!$zone) {
+                continue;
+            }
+            $methods = $zone->get_shipping_methods(true); // enabled-only: matches what the endpoint can return
+            if (empty($methods)) {
+                continue;
+            }
+            $rendered_any = true;
+            echo '<h4 style="margin:1em 0 .3em;">' . esc_html($zone->get_zone_name()) . '</h4>';
+            foreach ($methods as $method) {
+                $id    = (string) $method->instance_id;
+                $name  = 'kolai_shipment_method_toggles[' . $id . ']';
+                $on    = !(isset($toggles[$id]) && $toggles[$id] === '0');
+                $label = !empty($method->title) ? $method->title : $method->get_method_title();
+                ?>
+                <label style="display:block;margin:.2em 0;">
+                    <input type="hidden" name="<?php echo esc_attr($name); ?>" value="0">
+                    <input type="checkbox" name="<?php echo esc_attr($name); ?>" value="1" <?php checked($on); ?>>
+                    <?php echo esc_html($label); ?>
+                </label>
+                <?php
+            }
+        }
+
+        if (!$rendered_any) {
+            echo '<p>' . esc_html__('Aktif kargo yontemi bulunamadi. WooCommerce > Kargo altindan yontem ekleyin.', 'kolai') . '</p>';
+        }
+    }
+
     /**
      * Render the meta map section description
      */

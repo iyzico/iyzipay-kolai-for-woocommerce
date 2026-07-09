@@ -294,6 +294,8 @@ class Kolai_Shipping_Service {
     private function get_rates_for_package($package) {
         add_filter('woocommerce_shipping_free_shipping_is_available', array($this, 'evaluate_free_shipping_for_package'), 10, 3);
 
+        $toggles = get_option('kolai_shipment_method_toggles', array());
+
         $rates = array();
         try {
             $zone = WC_Shipping_Zones::get_zone_matching_package($package);
@@ -301,6 +303,12 @@ class Kolai_Shipping_Service {
 
             foreach ($methods as $method) {
                 if (!$method->enabled) {
+                    continue;
+                }
+
+                if (is_array($toggles)
+                    && isset($toggles[(string) $method->instance_id])
+                    && $toggles[(string) $method->instance_id] === '0') {
                     continue;
                 }
 

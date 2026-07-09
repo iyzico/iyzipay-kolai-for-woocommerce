@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.4
+Stable tag: 1.8.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -71,6 +71,9 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.5 =
+* Shipping-options scope: a new **Kargo Yöntemleri (iyzico)** section on **WP Admin → Kolai** lists your active WooCommerce shipping methods (grouped by zone) with a per-method enable/disable toggle. Turning one off hides it from the `/shipment-options` endpoint (and rejects orders that reference it) **without** affecting normal WooCommerce checkout. Methods are enabled by default, so existing integrations are unchanged until you opt to hide one.
+
 = 1.8.4 =
 * Address district field: iyzico now sends the district (ilçe) as `town`. The order `city` is now read from `town`, falling back to `district` then `districtId` (first non-empty), so it stays populated across the field rename.
 * City fallback: when no district is provided at all, `city` now falls back to the province (il) name from WooCommerce's Turkey state list (e.g. `TR01` → "Adana") instead of being left empty.
@@ -129,6 +132,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.5 =
+Adds per-method enable/disable toggles for the `/shipment-options` endpoint under WP Admin → Kolai. Purely additive — all methods stay enabled until you turn one off, and WooCommerce checkout is unaffected.
 
 = 1.8.4 =
 iyzico renamed the district field to `town`; the order city now reads `town` (falling back to `district` / `districtId`) so it stays populated.
