@@ -14,7 +14,7 @@ tek tek işaretlenerek kullanılmak üzere hazırlanmıştır.
 | WooCommerce | 5.0+ (10.9.1 ile test edildi) | **Aktif** olmalı; değilse eklenti kendini devre dışı bırakır |
 | PHP | 7.2+ | 8.1+ önerilir |
 | HTTPS | Zorunlu | Kolai yalnızca `https://` uçlara istek atar |
-| Kalıcı bağlantılar (Permalink) | "Sade" **olmamalı** | Aşağıya bakın |
+| Kalıcı bağlantılar (Permalink) | "Sade" **olmamalı** | Aşağıdan kontrol edebilirsiniz |
 
 ### Permalink ayarı (atlanırsa imza doğrulaması patlar)
 
