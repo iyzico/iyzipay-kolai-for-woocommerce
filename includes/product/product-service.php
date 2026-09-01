@@ -380,6 +380,10 @@ class Kolai_Product_Service {
 
             'parent_id'         => $product->get_parent_id(),
 
+            // Rating (postmeta, already primed — no extra query)
+            'average_rating'    => $product->get_average_rating(),
+            'review_count'      => $product->get_review_count(),
+
             // Main image only (gallery omitted from list)
             'image'             => $this->get_product_image($product),
         );

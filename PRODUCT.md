@@ -33,6 +33,20 @@ Tüm ürün/varyasyon yanıtlarında fiyatlar **vergi dahil** döner ve vergi k�
 
 ---
 
+## Değerlendirme Alanları (Rating)
+
+Hem liste hem tek ürün yanıtlarında döner. Kaynak WooCommerce'in kendi
+`_wc_average_rating` / `_wc_review_count` postmeta'sıdır (onaylı yorumlar).
+
+| Alan | Tip | Açıklama |
+|---|---|---|
+| `averageRating` | number | Ortalama puan, 2 haneye yuvarlanır (0–5). Yorum yoksa `0` |
+| `reviewCount` | int | Onaylanmış değerlendirme sayısı. Yorum yoksa `0` |
+
+> Varyasyonlarda ayrı puan dönmez; puan parent ürün seviyesindedir.
+
+---
+
 ## GET /products
 
 Ürünleri **sayfalanmış** olarak listeler. Büyük katalog için tek istekte tüm ürünleri çekmeye çalışmayın — endpoint zorunlu olarak sayfalama uygular.
@@ -66,6 +80,7 @@ Mapper aracılığıyla aşağıdaki alanlar (mevcutsa) döner:
 ```
 id, title, link, imageLink, inStock, currency, price, salePrice,
 includedTax, taxPrice, taxPercentage,
+averageRating, reviewCount,
 salePriceEffectiveDate, productType, gtin, mpn, itemGroupId,
 productLength, productWidth, productHeight, productWeight
 ```
@@ -110,6 +125,8 @@ GET /wp-json/kolai/v1/products?modified_after=2026-05-05T00:00:00Z
       "includedTax": true,
       "taxPrice": "17.80",
       "taxPercentage": 20,
+      "averageRating": 4.33,
+      "reviewCount": 12,
       "productType": "simple",
       "gtin": "TS-001",
       "mpn": "TS-001",
@@ -187,6 +204,8 @@ GET /wp-json/kolai/v1/products/12
     "taxPrice": "17.80",
     "taxPercentage": 20,
     "salePriceEffectiveDate": "2026-05-01T00:00:00+00:00/2026-05-31T23:59:59+00:00",
+    "averageRating": 4.33,
+    "reviewCount": 12,
     "productType": "variable",
     "gtin": "TS-001",
     "mpn": "TS-001",

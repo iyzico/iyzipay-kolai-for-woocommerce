@@ -84,6 +84,14 @@ class Kolai_Product_Mapper {
             $mapped['salePriceEffectiveDate'] = $product_data['date_on_sale_from'] . '/' . $product_data['date_on_sale_to'];
         }
         
+        // Rating
+        if (isset($product_data['average_rating'])) {
+            $mapped['averageRating'] = round(floatval($product_data['average_rating']), 2);
+        }
+        if (isset($product_data['review_count'])) {
+            $mapped['reviewCount'] = (int) $product_data['review_count'];
+        }
+
         // Product Category
         if (isset($product_data['type'])) $mapped['productType'] = $product_data['type'];
         
