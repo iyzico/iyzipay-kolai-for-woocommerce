@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.5
+Stable tag: 1.8.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -71,6 +71,9 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.6 =
+* Product rating fields: `/products` and `/products/{id}` now return `averageRating` (0-5, 2 decimals) and `reviewCount` from WooCommerce's approved-review meta. Purely additive; no extra queries on the list endpoint.
+
 = 1.8.5 =
 * Shipping-options scope: a new **Kargo Yöntemleri (iyzico)** section on **WP Admin → Kolai** lists your active WooCommerce shipping methods (grouped by zone) with a per-method enable/disable toggle. Turning one off hides it from the `/shipment-options` endpoint (and rejects orders that reference it) **without** affecting normal WooCommerce checkout. Methods are enabled by default, so existing integrations are unchanged until you opt to hide one.
 
@@ -132,6 +135,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.6 =
+Adds `averageRating` and `reviewCount` to the product API responses. Additive only — no existing field changes.
 
 = 1.8.5 =
 Adds per-method enable/disable toggles for the `/shipment-options` endpoint under WP Admin → Kolai. Purely additive — all methods stay enabled until you turn one off, and WooCommerce checkout is unaffected.
