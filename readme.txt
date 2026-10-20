@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.7
+Stable tag: 1.8.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -76,6 +76,10 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.8 =
+* Product Bundles pricing: for Product Bundles products, `price` / `salePrice` / `taxPrice` now come from the bundle's own minimum price (bundled items included, tax computed per bundled item) instead of the container's base price. The advertised price now matches the total of the order lines created for the bundle, so no adjustment fee is needed after payment.
+* Product Bundles contents: `/products/{id}` and `/products-with-variants/{id}` return a new `bundledItems` array for bundle products, listing the non-optional bundled products (id, title, sku, link, imageLink, quantity, tax-inclusive unit price inside the bundle, pricedIndividually, inStock). Additive; not included in the `/products` list.
+
 = 1.8.7 =
 * Product Bundles orders: when an order references a WooCommerce Product Bundles product, its bundled items (e.g. free gift products the storefront cart adds automatically) are now added to the order as separate lines with the bundle's default configuration and pricing. Previously only the bundle container line was written. If the bundle cannot be added (e.g. a bundled item is out of stock), the request fails with `2004` instead of creating an incomplete order.
 
@@ -143,6 +147,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.8 =
+Product Bundles products now report their full bundle price (bundled items included) and list their contents in `bundledItems`. Prices of bundle products in Kolai may change.
 
 = 1.8.7 =
 Orders for Product Bundles products now include their bundled items (e.g. free gifts). No request or response field changes.
