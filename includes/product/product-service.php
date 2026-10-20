@@ -500,6 +500,10 @@ class Kolai_Product_Service {
             $data['variations'] = $this->get_product_variations($product);
         }
 
+        if ($product->is_type('bundle')) {
+            $data['bundled_items'] = $this->get_bundled_items($product);
+        }
+
         return $data;
     }
 
@@ -525,6 +529,10 @@ class Kolai_Product_Service {
      * @return array{included_tax:bool, price:float, sale_price:float|null, tax_price:float, tax_percentage:float}
      */
     private function calculate_tax_fields($product, $price, $sale_price) {
+        if ($product->is_type('bundle') && method_exists($product, 'get_bundle_price_including_tax')) {
+            return $this->calculate_bundle_tax_fields($product);
+        }
+
         if (!$product->is_taxable()) {
             return array(
                 'included_tax'   => false,
@@ -562,6 +570,41 @@ class Kolai_Product_Service {
             'included_tax'   => true,
             'price'          => $price_incl,
             'sale_price'     => $sale_incl,
+            'tax_price'      => $tax_price,
+            'tax_percentage' => $tax_percentage,
+        );
+    }
+
+    /**
+     * Price fields for a WooCommerce Product Bundles product.
+     *
+     * get_price() on a bundle is only the container's base price; it leaves out
+     * bundled items that are priced individually (e.g. a 0.05 TL gift). Orders
+     * add those items as their own lines (see Kolai_Order_Service), so
+     * advertising the base price would make Kolai charge less than the order
+     * total and force a negative adjustment fee onto the invoice. Use the
+     * bundle's own minimum price instead, which is what the default
+     * configuration added to the order costs. Product Bundles computes tax per
+     * bundled item, so tax-inclusive/-exclusive totals come from it as well
+     * rather than from the container's tax class.
+     *
+     * @param WC_Product $product Product Bundles product.
+     * @return array{included_tax:bool, price:float, sale_price:float|null, tax_price:float, tax_percentage:float}
+     */
+    private function calculate_bundle_tax_fields($product) {
+        $price_incl = (float) $product->get_bundle_price_including_tax('min');
+        $price_excl = (float) $product->get_bundle_price_excluding_tax('min');
+
+        $tax_price      = round($price_incl - $price_excl, 2);
+        $tax_percentage = $price_excl > 0
+            ? round(($tax_price / $price_excl) * 100, 2)
+            : 0.0;
+
+        return array(
+            'included_tax'   => $tax_price > 0,
+            'price'          => $price_incl,
+            // get_bundle_price() is already the active (sale-aware) price.
+            'sale_price'     => $product->is_on_sale() ? $price_incl : null,
             'tax_price'      => $tax_price,
             'tax_percentage' => $tax_percentage,
         );
@@ -673,6 +716,74 @@ class Kolai_Product_Service {
         }
 
         return $variations;
+    }
+
+    /**
+     * Products contained in a WooCommerce Product Bundles product.
+     *
+     * Only non-optional items are returned: they are exactly the lines a Kolai
+     * order for this bundle receives (optional items cannot be selected through
+     * the API). Each item is reported like a regular product with its unit price
+     * inside the bundle — 0 when the bundle does not price it individually,
+     * otherwise the bundle-discounted price, tax-inclusive like every other
+     * price in the API. Quantities and prices use the bundle's minimum
+     * configuration, matching the bundle `price`.
+     *
+     * @param WC_Product $product Product Bundles product.
+     * @return array<int,array<string,mixed>>
+     */
+    private function get_bundled_items($product) {
+        if (!method_exists($product, 'get_bundled_items')) {
+            return array();
+        }
+
+        $items = array();
+        foreach ((array) $product->get_bundled_items() as $bundled_item) {
+            if (!is_object($bundled_item) || !method_exists($bundled_item, 'get_product')) {
+                continue;
+            }
+            if (method_exists($bundled_item, 'is_optional') && $bundled_item->is_optional()) {
+                continue;
+            }
+
+            $child = $bundled_item->get_product();
+            if (!$child) {
+                continue;
+            }
+
+            $quantity = method_exists($bundled_item, 'get_quantity') ? (int) $bundled_item->get_quantity('min') : 1;
+            if ($quantity < 1) {
+                continue;
+            }
+
+            $priced_individually = method_exists($bundled_item, 'is_priced_individually')
+                ? (bool) $bundled_item->is_priced_individually()
+                : true;
+
+            $unit_price = 0.0;
+            if ($priced_individually) {
+                $unit_price = method_exists($bundled_item, 'get_price')
+                    ? (float) $bundled_item->get_price('min')
+                    : (float) $child->get_price();
+                if ($child->is_taxable()) {
+                    $unit_price = (float) wc_get_price_including_tax($child, array('price' => $unit_price));
+                }
+            }
+
+            $items[] = array(
+                'id'                  => $child->get_id(),
+                'name'                => $child->get_name(),
+                'sku'                 => $child->get_sku(),
+                'permalink'           => get_permalink($child->get_id()),
+                'image'               => $this->get_product_image($child),
+                'quantity'            => $quantity,
+                'price'               => $unit_price,
+                'priced_individually' => $priced_individually,
+                'in_stock'            => $child->is_in_stock(),
+            );
+        }
+
+        return $items;
     }
 
     /**

@@ -147,8 +147,46 @@ class Kolai_Product_Mapper {
             $mapped['variations'] = self::map_variations($variations);
         }
         if (isset($product_data['attributes'])) $mapped['attributes'] = $product_data['attributes'];
+
+        // Products inside a Product Bundles product, reported like regular products.
+        if (isset($product_data['bundled_items']) && is_array($product_data['bundled_items'])) {
+            $mapped['bundledItems'] = self::map_bundled_items($product_data['bundled_items']);
+        }
         
         return $mapped;
+    }
+
+    /**
+     * Map bundled items array to camelCase format
+     *
+     * @param array $bundled_items Array of bundled item data
+     * @return array Array of mapped bundled items
+     */
+    private static function map_bundled_items($bundled_items) {
+        $mapped_items = array();
+
+        foreach ($bundled_items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $mapped = array();
+            if (isset($item['id'])) $mapped['id'] = (string) $item['id'];
+            if (isset($item['name'])) $mapped['title'] = $item['name'];
+            if (!empty($item['sku'])) $mapped['sku'] = $item['sku'];
+            if (isset($item['permalink'])) $mapped['link'] = $item['permalink'];
+            if (isset($item['image']['url'])) $mapped['imageLink'] = $item['image']['url'];
+            if (isset($item['quantity'])) $mapped['quantity'] = (int) $item['quantity'];
+            if (isset($item['price'])) {
+                $mapped['price'] = (string) number_format(floatval($item['price']), 2, '.', '');
+            }
+            if (isset($item['priced_individually'])) $mapped['pricedIndividually'] = (bool) $item['priced_individually'];
+            if (isset($item['in_stock'])) $mapped['inStock'] = (bool) $item['in_stock'];
+
+            $mapped_items[] = $mapped;
+        }
+
+        return $mapped_items;
     }
     
     /**

@@ -30,6 +30,7 @@ Tüm ürün/varyasyon yanıtlarında fiyatlar **vergi dahil** döner ve vergi k�
 > - Ürün **vergilendirilemez** ise: `includedTax = false`, `taxPrice = "0.00"`, `taxPercentage = 0` döner ve `price`/`salePrice` net değerleriyle kalır.
 > - `taxPrice` her zaman müşterinin ödediği **efektif** fiyatın (indirim varsa indirimli) vergisidir; `price` ve `salePrice` için ayrı vergi tutarı dönmez.
 > - Net (vergi hariç) değer gerekirse `salePrice - taxPrice` (veya indirim yokken `price - taxPrice`) ile hesaplanabilir.
+> - [Product Bundles for WooCommerce](https://woocommerce.com/products/product-bundles/) ürünlerinde (`productType: "bundle"`) fiyat, paketin yalnızca taban fiyatı değil, **varsayılan paket içeriğiyle birlikte** toplam fiyatıdır (ayrı fiyatlandırılan paket ürünleri, örn. 0,05 TL'lik hediye, dahil). Bu, `POST /orders` ile oluşan sipariş satırlarının toplamıyla aynıdır. Vergi tutarı her paket ürününün kendi vergi sınıfına göre hesaplanır.
 
 ---
 
@@ -249,6 +250,42 @@ GET /wp-json/kolai/v1/products/12
 > **Notlar**
 > - Variable ürünlerde **maksimum 100 varyasyon** dönülür. Üstündeki varyasyonlu üründe son satıra `{ "_truncated": true, "_max": 100 }` markörü eklenir; `warning` seviyesinde log üretilir.
 > - Ürün bir **varyasyon** ID'si ile çağrıldıysa parent ürüne yönlendirme yapılmaz; bunun için `/products-with-variants/{id}` kullanın.
+
+### Bundle ürünler (`bundledItems`)
+
+[Product Bundles for WooCommerce](https://woocommerce.com/products/product-bundles/) ürünlerinde (`productType: "bundle"`) detay yanıtı (`/products/{id}` ve `/products-with-variants/{id}`) paketin içindeki ürünleri `bundledItems` alanında döner. Liste endpoint'inde (`/products`) bu alan yoktur.
+
+Bu ürünler, `POST /orders` ile bu paket sipariş edildiğinde siparişe otomatik eklenen satırlardır; sipariş isteğinde ayrıca **gönderilmemelidir**. Opsiyonel paket ürünleri API üzerinden seçilemediği için listede yer almaz.
+
+```json
+"productType": "bundle",
+"isBundle": "yes",
+"price": "100.05",
+"bundledItems": [
+  {
+    "id": "456",
+    "title": "Mousepad",
+    "sku": "MP-01",
+    "link": "https://your-site.com/product/mousepad",
+    "imageLink": "https://.../mousepad.jpg",
+    "quantity": 1,
+    "price": "0.05",
+    "pricedIndividually": true,
+    "inStock": true
+  }
+]
+```
+
+| Alan | Tip | Açıklama |
+|---|---|---|
+| `id` | string | Paketteki ürünün ID'si |
+| `title` | string | Ürün adı |
+| `sku` | string | Ürün SKU'su (boşsa alan dönmez) |
+| `link` / `imageLink` | string | Ürün sayfası ve ana görsel |
+| `quantity` | int | Bir paket içindeki adet |
+| `price` | string | Paket içindeki **birim** fiyat, vergi dahil. Paket ürünü ayrı fiyatlandırmıyorsa `"0.00"` |
+| `pricedIndividually` | bool | `false` ise ürünün fiyatı paketin taban fiyatına dahildir |
+| `inStock` | bool | Stok durumu |
 
 ### Response (error example)
 
