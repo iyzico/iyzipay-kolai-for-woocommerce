@@ -112,7 +112,7 @@ class Kolai_Order_Service {
             $this->apply_billing_invoice_meta($order, $billing);
 
             foreach ($items as $item) {
-                $order->add_product($item['product'], $item['quantity']);
+                $this->add_order_line($order, $item['product'], $item['quantity']);
             }
 
             // Pass the real quantities (and variation ids) so the shipping rate is
@@ -162,6 +162,47 @@ class Kolai_Order_Service {
             'paymentMethod' => $order->get_payment_method(),
             'orderExpireAt' => $order_expire_at,
         );
+    }
+
+    /**
+     * Add a product line to the order.
+     *
+     * Plain add_product() only writes the container line for a WooCommerce
+     * Product Bundles product, so its bundled items (e.g. free gift items the
+     * storefront cart adds automatically) never reach the order. Route bundles
+     * through Product Bundles' own API so the children are added with their
+     * default configuration and bundle pricing, exactly like the cart does.
+     *
+     * @param WC_Order   $order
+     * @param WC_Product $product
+     * @param int        $quantity
+     * @return void
+     */
+    private function add_order_line($order, $product, $quantity) {
+        if (!$product->is_type('bundle') || !function_exists('WC_PB') || !isset(WC_PB()->order)) {
+            $order->add_product($product, $quantity);
+            return;
+        }
+
+        $result = WC_PB()->order->add_bundle_to_order($product, $order, $quantity, array('silent' => true));
+
+        if (is_wp_error($result) || !$result) {
+            $message = is_wp_error($result) ? $result->get_error_message() : 'unknown error';
+            Kolai_Logger::error('order', 'Failed to add bundle to order', array(
+                'order_id'   => $order->get_id(),
+                'product_id' => $product->get_id(),
+                'quantity'   => $quantity,
+                'error'      => $message,
+            ));
+            throw new Kolai_Invalid_Product_List_Exception('Bundle product could not be added: ' . wp_strip_all_tags($message));
+        }
+
+        Kolai_Logger::info('order', 'Bundle added to order with bundled items', array(
+            'order_id'           => $order->get_id(),
+            'product_id'         => $product->get_id(),
+            'quantity'           => $quantity,
+            'container_item_id'  => (int) $result,
+        ));
     }
 
     /**
