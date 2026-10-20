@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.6
+Stable tag: 1.8.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -71,6 +71,9 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 
 == Changelog ==
 
+= 1.8.7 =
+* Product Bundles orders: when an order references a WooCommerce Product Bundles product, its bundled items (e.g. free gift products the storefront cart adds automatically) are now added to the order as separate lines with the bundle's default configuration and pricing. Previously only the bundle container line was written. If the bundle cannot be added (e.g. a bundled item is out of stock), the request fails with `2004` instead of creating an incomplete order.
+
 = 1.8.6 =
 * Product rating fields: `/products` and `/products/{id}` now return `averageRating` (0-5, 2 decimals) and `reviewCount` from WooCommerce's approved-review meta. Purely additive; no extra queries on the list endpoint.
 
@@ -135,6 +138,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.7 =
+Orders for Product Bundles products now include their bundled items (e.g. free gifts). No request or response field changes.
 
 = 1.8.6 =
 Adds `averageRating` and `reviewCount` to the product API responses. Additive only — no existing field changes.
