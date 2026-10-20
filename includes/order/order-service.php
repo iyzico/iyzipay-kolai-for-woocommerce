@@ -179,12 +179,24 @@ class Kolai_Order_Service {
      * @return void
      */
     private function add_order_line($order, $product, $quantity) {
-        if (!$product->is_type('bundle') || !function_exists('WC_PB') || !isset(WC_PB()->order)) {
+        if (!$product->is_type('bundle')) {
             $order->add_product($product, $quantity);
             return;
         }
 
-        $result = WC_PB()->order->add_bundle_to_order($product, $order, $quantity, array('silent' => true));
+        $bundle_order = $this->get_bundle_order_handler();
+        if (!$bundle_order) {
+            // A bundle product without a usable Product Bundles API would lose its
+            // bundled items silently; make that visible in the logs.
+            Kolai_Logger::warning('order', 'Product Bundles order API not available; adding bundle container only', array(
+                'order_id'   => $order->get_id(),
+                'product_id' => $product->get_id(),
+            ));
+            $order->add_product($product, $quantity);
+            return;
+        }
+
+        $result = $bundle_order->add_bundle_to_order($product, $order, $quantity, array('silent' => true));
 
         if (is_wp_error($result) || !$result) {
             $message = is_wp_error($result) ? $result->get_error_message() : 'unknown error';
@@ -203,6 +215,32 @@ class Kolai_Order_Service {
             'quantity'           => $quantity,
             'container_item_id'  => (int) $result,
         ));
+    }
+
+    /**
+     * Resolve Product Bundles' order handler (WC_PB_Order).
+     *
+     * WC_PB()->order may be exposed through a magic getter, where isset()
+     * reports false even though the handler exists, so read it directly and
+     * fall back to the class singleton.
+     *
+     * @return object|null Handler with add_bundle_to_order(), or null.
+     */
+    private function get_bundle_order_handler() {
+        $handler = null;
+
+        if (function_exists('WC_PB')) {
+            $pb = WC_PB();
+            if (is_object($pb) && (property_exists($pb, 'order') || method_exists($pb, '__get'))) {
+                $handler = $pb->order;
+            }
+        }
+
+        if (!is_object($handler) && class_exists('WC_PB_Order') && is_callable(array('WC_PB_Order', 'instance'))) {
+            $handler = WC_PB_Order::instance();
+        }
+
+        return (is_object($handler) && is_callable(array($handler, 'add_bundle_to_order'))) ? $handler : null;
     }
 
     /**
