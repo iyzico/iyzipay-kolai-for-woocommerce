@@ -23,6 +23,7 @@ iyzico Kolai for WooCommerce exposes a signed REST API that lets the Kolai platf
 * **iyzico refund / cancel integration** — refunds run through the native WooCommerce "Refund" button via a hidden `kolai-app` gateway; order cancellations are forwarded to iyzico on the `cancelled` status transition. The iyzipay-php SDK is bundled.
 * **Structured logging** — an optional, DB-backed log subsystem with an admin page (level, retention, live table with filtering) and a daily cleanup cron.
 * **Admin settings** — Kolai API key/secret, clarification-text page, seller/contract details, and iyzico refund API credentials (key/secret/environment).
+* **Product Bundles support** — when an order references a [Product Bundles for WooCommerce](https://woocommerce.com/products/product-bundles/) product, its bundled items (e.g. free gift products) are added to the order exactly as the storefront cart adds them.
 * **HPOS & Blocks ready** — declares compatibility with WooCommerce High-Performance Order Storage and the Cart/Checkout Blocks.
 
 = REST API overview =
@@ -49,6 +50,10 @@ No. The bundled `kolai-app` gateway is hidden from checkout — orders are creat
 = Is it compatible with High-Performance Order Storage (HPOS)? =
 
 Yes. The plugin uses the WooCommerce CRUD APIs and declares HPOS compatibility, as well as compatibility with the Cart/Checkout Blocks.
+
+= Does it work with Product Bundles for WooCommerce? =
+
+Yes. If [Product Bundles for WooCommerce](https://woocommerce.com/products/product-bundles/) is active and an order sent through the Kolai API contains a bundle product, the bundled items (including free gift items) are added to the order as separate lines with the bundle's default configuration and pricing. The Kolai platform only needs to send the bundle product itself. If the bundle cannot be added (for example a bundled item is out of stock), the order is rejected instead of being created without those items.
 
 = Where are the logs stored? =
 

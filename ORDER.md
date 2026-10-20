@@ -97,7 +97,7 @@ POST /wp-json/kolai/v1/orders
 
 Not: `discountAmount` opsiyoneldir. Gonderildiginde `0.00` dan buyuk olmalidir.
 
-Not: `productId` bir **WooCommerce Product Bundles** urunu (`productType: "bundle"`) ise, paket icindeki urunler (orn. bedelsiz hediye urunler) magazadaki sepetle ayni sekilde, varsayilan paket ayari ve fiyatlariyla siparise ayri satirlar olarak otomatik eklenir. Caller'in bu urunleri `products` icinde ayrica gondermesi **gerekmez**. Paket eklenemezse (orn. icerdeki bir urunun stogu yoksa) siparis eksik olusturulmaz; `400` + `2004` (Invalid product list) doner.
+Not: `productId` bir [Product Bundles for WooCommerce](https://woocommerce.com/products/product-bundles/) urunu (`productType: "bundle"`) ise, paket icindeki urunler (orn. bedelsiz hediye urunler) magazadaki sepetle ayni sekilde, varsayilan paket ayari ve fiyatlariyla siparise ayri satirlar olarak otomatik eklenir. Caller'in bu urunleri `products` icinde ayrica gondermesi **gerekmez**. Paket eklenemezse (orn. icerdeki bir urunun stogu yoksa) siparis eksik olusturulmaz; `400` + `2004` (Invalid product list) doner.
 
 Not: Adres alanlari (hem `billingAddress` hem `shippingAddress` icin ayni):
 - `countryId`: ulke kodu (`TR`). Zorunlu.

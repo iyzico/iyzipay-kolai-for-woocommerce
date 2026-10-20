@@ -90,6 +90,12 @@ Detayli istek/yanit ornekleri ve aciklamalar icin ilgili dokümana gidin:
 | Sözleşmeler | WP Admin → Kolai → Sozlesmeler | Satıcı bilgileri, mesafeli satış / ön bilgilendirme metinleri |
 | Loglar | WP Admin → Kolai → Loglar | Log tutma anahtarı, seviye, retention; canlı log tablosu (filtre + temizle) — bkz. [LOGS.md](LOGS.md) |
 
+## Uyumlu Eklentiler
+
+| Eklenti | Destek |
+|---|---|
+| [Product Bundles for WooCommerce](https://woocommerce.com/products/product-bundles/) | `POST /orders` ile bir paket (`productType: "bundle"`) ürünü sipariş edildiğinde, paketteki ürünler (örn. bedelsiz hediye ürünler) mağazadaki sepetle aynı şekilde siparişe ayrı satırlar olarak eklenir. Detay [ORDER.md](ORDER.md). |
+
 ## Yapı
 
 ```
