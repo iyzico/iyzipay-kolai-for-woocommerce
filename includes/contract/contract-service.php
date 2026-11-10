@@ -85,7 +85,15 @@ class Kolai_Contract_Service {
             throw new Kolai_Contract_Not_Found_Exception("Contract template not found for type: {$type}");
         }
 
-        $content = strtr($template, $this->get_admin_replacements());
+        $replacements = $this->get_admin_replacements();
+
+        // MERSIS is optional: when it is not set, drop its line from the contract
+        // instead of sending an empty "MERSIS No:" label to the customer.
+        if (trim((string) $replacements['{{seller_mersis_no}}']) === '') {
+            $template = $this->remove_optional_placeholder_line($template, '{{seller_mersis_no}}');
+        }
+
+        $content = strtr($template, $replacements);
 
         return array(
             'content'      => $content,
@@ -212,6 +220,47 @@ class Kolai_Contract_Service {
         }
 
         return $placeholders;
+    }
+
+    /**
+     * Remove the label of an optional, unset placeholder from contract HTML.
+     *
+     * A segment such as `<strong>MERSIS No:</strong> {{seller_mersis_no}}` is
+     * removed together with the `<br>` that separates it from its neighbours,
+     * whether the segments are on separate lines or on one line (as wp_editor
+     * may save them). A paragraph that holds only that label is removed. When
+     * the placeholder sits inside running text, only the placeholder itself is
+     * removed so the surrounding sentence is left intact.
+     *
+     * @param string $template    Contract HTML.
+     * @param string $placeholder Placeholder to remove, including braces.
+     * @return string
+     */
+    private function remove_optional_placeholder_line($template, $placeholder) {
+        if (strpos($template, $placeholder) === false) {
+            return $template;
+        }
+
+        $ph    = preg_quote($placeholder, '/');
+        $label = '(?:<(?:strong|b)>[^<]{0,40}<\/(?:strong|b)>|[^<>\r\n]{0,40})[ \t]*';
+        $br    = '<br\s*\/?>';
+        $nl    = '(?:\r\n|\n|\r)';
+
+        $patterns = array(
+            // A paragraph holding only the label: drop the whole paragraph.
+            '/<p[^>]*>\s*' . $label . $ph . '\s*(?:' . $br . '\s*)?<\/p>[ \t]*' . $nl . '?/i' => '',
+            // Label followed by <br>: drop the label, its <br> and its line break.
+            '/(^[ \t]*|' . $br . '[ \t]*|<p[^>]*>[ \t]*)' . $label . $ph . '[ \t]*' . $br . '[ \t]*' . $nl . '?/im' => '$1',
+            // Last label of its block: drop it together with the preceding <br>.
+            '/' . $br . '[ \t]*' . $nl . '?[ \t]*' . $label . $ph . '[ \t]*(?=' . $nl . '?[ \t]*<\/|\z)/i' => '',
+        );
+
+        foreach ($patterns as $pattern => $replacement) {
+            $template = preg_replace($pattern, $replacement, $template);
+        }
+
+        // Anything left is inline text: remove only the placeholder.
+        return str_replace($placeholder, '', $template);
     }
 
     /**

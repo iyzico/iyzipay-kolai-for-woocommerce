@@ -139,6 +139,7 @@ $right_of_withdrawal_period = get_option('kolai_right_of_withdrawal_period', '')
             <tr>
                 <th scope="row">
                     <label for="kolai_seller_mersis_no"><?php esc_html_e('MERSIS Numarasi', 'kolai'); ?></label>
+                    <span class="description">(<?php esc_html_e('opsiyonel', 'kolai'); ?>)</span>
                 </th>
                 <td>
                     <input type="text"
@@ -146,7 +147,11 @@ $right_of_withdrawal_period = get_option('kolai_right_of_withdrawal_period', '')
                            id="kolai_seller_mersis_no"
                            value="<?php echo esc_attr($seller_mersis_no); ?>"
                            class="regular-text"
+                           aria-describedby="kolai_seller_mersis_no_description"
                            placeholder="<?php esc_attr_e('MERSIS numarasi girin', 'kolai'); ?>" />
+                    <p class="description" id="kolai_seller_mersis_no_description">
+                        <?php esc_html_e('Bos birakilirsa MERSIS satiri sozlesmelerden cikarilir.', 'kolai'); ?>
+                    </p>
                 </td>
             </tr>
         </table>

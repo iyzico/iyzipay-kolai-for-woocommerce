@@ -348,6 +348,14 @@ msgstr ""
 msgid "MERSIS numarasi girin"
 msgstr ""
 
+#: admin/views/contracts-page.php:142
+msgid "opsiyonel"
+msgstr ""
+
+#: admin/views/contracts-page.php:153
+msgid "Bos birakilirsa MERSIS satiri sozlesmelerden cikarilir."
+msgstr ""
+
 #: admin/views/contracts-page.php:156
 msgid "Teslimat ve Cayma Hakki"
 msgstr ""

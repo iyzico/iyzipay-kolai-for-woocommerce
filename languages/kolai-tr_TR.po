@@ -362,6 +362,14 @@ msgstr "MERSIS Numarası"
 msgid "MERSIS numarasi girin"
 msgstr "MERSIS numarası girin"
 
+#: admin/views/contracts-page.php:142
+msgid "opsiyonel"
+msgstr "opsiyonel"
+
+#: admin/views/contracts-page.php:153
+msgid "Bos birakilirsa MERSIS satiri sozlesmelerden cikarilir."
+msgstr "Boş bırakılırsa MERSİS satırı sözleşmelerden çıkarılır."
+
 #: admin/views/contracts-page.php:156
 msgid "Teslimat ve Cayma Hakki"
 msgstr "Teslimat ve Cayma Hakkı"

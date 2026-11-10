@@ -168,7 +168,7 @@ Asagidaki alanlar WP Admin > Kolai > Sozlesmeler sayfasindan girilir ve API yani
 | `{{seller_phone}}` | Satici telefonu |
 | `{{seller_email}}` | Satici e-posta adresi |
 | `{{seller_tax_id}}` | Satici VKN |
-| `{{seller_mersis_no}}` | Satici MERSIS numarasi |
+| `{{seller_mersis_no}}` | Satici MERSIS numarasi (opsiyonel; bos ise bu yer tutucuyu iceren etiket satiri, orn. `MERSIS No: ...`, yanittan cikarilir) |
 | `{{delivery_date}}` | Tahmini teslim tarihi |
 | `{{right_of_withdrawal_period}}` | Cayma hakki suresi |
 

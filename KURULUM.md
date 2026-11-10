@@ -107,13 +107,13 @@ WooCommerce ödeme akışı etkilenmez. Varsayılan: hepsi açık.
 
 Bu ekrandaki değerler sözleşme şablonlarındaki yer tutucuları otomatik doldurur.
 
-**Satıcı Bilgileri** — hepsi zorunlu:
+**Satıcı Bilgileri** — MERSİS dışındakiler zorunlu:
 - Satıcı Adı / Unvanı
 - Satıcı Adresi
 - Satıcı Telefonu
 - Satıcı E-posta Adresi
 - **Vergi Kimlik Numarası (VKN)**
-- **MERSİS Numarası**
+- MERSİS Numarası (opsiyonel; boş bırakılırsa MERSİS satırı sözleşmelerden çıkarılır)
 
 **Teslimat ve Cayma Hakkı:**
 - Tahmini Teslim Tarihi (örn. "3 iş günü")
