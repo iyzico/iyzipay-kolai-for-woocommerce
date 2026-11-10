@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.8
+Stable tag: 1.8.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -75,6 +75,9 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 * Privacy policy: https://www.iyzico.com/en/privacy-policy
 
 == Changelog ==
+
+= 1.8.9 =
+* Optional MERSIS number: the seller MERSIS number on **WP Admin → Kolai → Sözleşmeler** is now optional. When it is left empty, the `MERSIS No:` line (with its surrounding `<br>`) is removed from the distance sales contract and preliminary information form returned by the contracts API, instead of an empty label. If the placeholder is used inside running text, only the placeholder is removed. When a MERSIS number is set, output is unchanged.
 
 = 1.8.8 =
 * Product Bundles pricing: for Product Bundles products, `price` / `salePrice` / `taxPrice` now come from the bundle's own minimum price (bundled items included, tax computed per bundled item) instead of the container's base price. The advertised price now matches the total of the order lines created for the bundle, so no adjustment fee is needed after payment.
@@ -147,6 +150,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.9 =
+The seller MERSIS number is now optional; when empty, its line is removed from the contracts. No API field changes.
 
 = 1.8.8 =
 Product Bundles products now report their full bundle price (bundled items included) and list their contents in `bundledItems`. Prices of bundle products in Kolai may change.
