@@ -49,6 +49,23 @@ abstract class Kolai_Route_Base {
     }
 
     /**
+     * Read a parameter from the matched route path only.
+     *
+     * WP_REST_Request::get_param() checks the query string before the route
+     * path, and the query string is not covered by the request signature. A
+     * request signed for /orders/123 could otherwise target another resource
+     * by appending ?orderId=456. Resource identifiers must come from the path.
+     *
+     * @param WP_REST_Request $request
+     * @param string          $name
+     * @return string|null
+     */
+    protected function get_path_param($request, $name) {
+        $params = $request->get_url_params();
+        return isset($params[$name]) ? (string) $params[$name] : null;
+    }
+
+    /**
      * Execute a handler with standardized error handling and logging.
      *
      * @param callable             $handler

@@ -17,6 +17,21 @@ if (!defined('ABSPATH')) {
 class Kolai_Order_Service {
 
     /**
+     * Payment method set on every order created through Kolai.
+     */
+    const PAYMENT_METHOD = 'kolai-app';
+
+    /**
+     * Named lock prefix for serializing PATCH /orders/{id} per order.
+     */
+    const UPDATE_LOCK_PREFIX = 'kolai_order_update_';
+
+    /**
+     * Seconds a PATCH waits for a concurrent update of the same order.
+     */
+    const UPDATE_LOCK_WAIT = 10;
+
+    /**
      * Check if WooCommerce is active
      *
      * @return bool
@@ -125,7 +140,7 @@ class Kolai_Order_Service {
             $order->add_item($shipping_item);
 
             $order->set_currency(get_woocommerce_currency());
-            $order->set_payment_method('kolai-app');
+            $order->set_payment_method(self::PAYMENT_METHOD);
             $order->set_payment_method_title('Kolai App');
 
             $order->calculate_totals();
@@ -309,10 +324,8 @@ class Kolai_Order_Service {
         if (!$this->is_woocommerce_active()) {
             throw new Kolai_WooCommerce_Inactive_Exception();
         }
-        $order = wc_get_order($order_id);
-        if (!$order || !$order->get_id()) {
-            throw new Kolai_Not_Found_Exception('Order not found');
-        }
+        $this->get_kolai_order($order_id);
+
         $new_status = isset($payload['orderStatus']) ? trim((string) $payload['orderStatus']) : '';
         if ($new_status === '') {
             throw new Kolai_Invalid_Order_Request_Exception('orderStatus is required');
@@ -322,6 +335,62 @@ class Kolai_Order_Service {
             throw new Kolai_Invalid_Order_Request_Exception('Invalid orderStatus: ' . $new_status);
         }
 
+        // Serialize updates per order: two concurrent PATCHes would otherwise both
+        // see the order as unpaid, so payment_complete() (stock reduction and the
+        // woocommerce_payment_complete action) could run twice.
+        $lock_name = self::UPDATE_LOCK_PREFIX . (int) $order_id;
+        $lock = Kolai_Lock::acquire($lock_name, self::UPDATE_LOCK_WAIT);
+        if ($lock === false) {
+            Kolai_Logger::warning('order', 'Order update lock timed out', array(
+                'order_id' => (int) $order_id,
+                'wait'     => self::UPDATE_LOCK_WAIT,
+            ));
+            throw new Kolai_Service_Unavailable_Exception('Order is being updated, please retry');
+        }
+
+        try {
+            // Reload under the lock so a concurrent update that just finished is seen.
+            $order = $this->get_kolai_order($order_id);
+            return $this->apply_status_update($order, $new_status, $payload);
+        } finally {
+            Kolai_Lock::release($lock_name, $lock);
+        }
+    }
+
+    /**
+     * Load an order that was created through Kolai.
+     *
+     * Orders placed through any other checkout are reported as not found, so a
+     * signed request can never mark a regular store order as paid by Kolai.
+     *
+     * @param int $order_id
+     * @return WC_Order
+     * @throws Kolai_Not_Found_Exception
+     */
+    private function get_kolai_order($order_id) {
+        $order = wc_get_order($order_id);
+        if (!$order || !$order->get_id()) {
+            throw new Kolai_Not_Found_Exception('Order not found');
+        }
+        if ($order->get_payment_method() !== self::PAYMENT_METHOD) {
+            Kolai_Logger::warning('order', 'Update rejected for an order not created by Kolai', array(
+                'order_id'       => $order->get_id(),
+                'payment_method' => $order->get_payment_method(),
+            ));
+            throw new Kolai_Not_Found_Exception('Order not found');
+        }
+        return $order;
+    }
+
+    /**
+     * Apply the requested status and payment fields to a Kolai order.
+     *
+     * @param WC_Order $order
+     * @param string   $new_status
+     * @param array    $payload
+     * @return array
+     */
+    private function apply_status_update($order, $new_status, $payload) {
         // Persist iyzico payment fields first so payment_complete() and any
         // downstream integrations observe them on the order.
         $this->apply_payment_meta($order, $payload);

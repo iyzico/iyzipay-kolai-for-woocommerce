@@ -113,7 +113,7 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
      */
     public function get_order($request) {
         return $this->handle(function() use ($request) {
-            $order_id = (int) $request->get_param('orderId');
+            $order_id = (int) $this->get_path_param($request, 'orderId');
             Kolai_Logger::info('order', 'get_order called', array('order_id' => $order_id));
             return $this->order_service->get_order_by_id($order_id);
         }, $request);
@@ -127,7 +127,7 @@ class Kolai_Order_Routes extends Kolai_Route_Base {
      */
     public function update_order($request) {
         return $this->handle(function() use ($request) {
-            $order_id = (int) $request->get_param('orderId');
+            $order_id = (int) $this->get_path_param($request, 'orderId');
             $params = $request->get_json_params();
             Kolai_Logger::info('order', 'update_order called', array(
                 'order_id' => $order_id,

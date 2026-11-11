@@ -268,6 +268,10 @@ Not: `orderExpireAt` hesaplamasi siparisin olusturulma zamanina (`dateCreated`) 
 
 Mevcut bir siparisin durumunu guncellemek icin kullanilir.
 
+- Yalnizca Kolai ile olusturulmus (`paymentMethod: "kolai-app"`) siparisler guncellenebilir. Magazanin diger odeme yontemleriyle verilmis siparisler icin `404` + `1002` (`Order not found`) doner.
+- `orderId` yalnizca URL yolundan okunur; sorgu dizesindeki (`?orderId=`) veya body'deki bir deger dikkate alinmaz.
+- Ayni siparis icin gelen guncellemeler sirayla islenir. Bir guncelleme 10 saniye icinde bitmezse sonraki istek `503` + `1003` (`Order is being updated, please retry`) ile reddedilir; istek tekrar denenebilir.
+
 ### Request
 
 ```

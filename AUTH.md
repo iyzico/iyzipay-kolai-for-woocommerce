@@ -42,7 +42,7 @@ signature = HMAC-SHA256(secretKey, salt + scope + uriPath + requestBody + timest
 - **secretKey**: wp_options'taki `kolai_secret_key` degeri
 - **salt**: Header'daki rastgele UUID
 - **scope**: Header'daki scope dizesi
-- **uriPath**: URL'nin path kismi (orn. `/wp-json/kolai/v1/products/123`), query string haric
+- **uriPath**: URL'nin path kismi (orn. `/wp-json/kolai/v1/products/123`), query string haric. Query string imzaya dahil olmadigi icin kaynak kimlikleri (`orderId`, urun ve yorum `id`'leri) sunucuda **yalnizca URL yolundan** okunur; `?orderId=` gibi eklenen bir parametre istegin hedefini degistiremez.
 - **requestBody**: POST/PATCH icin ham JSON body; GET icin bos string
 - **timestamp**: Gonderildiginde imza mesajinin **sonuna** eklenir (unix epoch saniye). Gonderilmediginde imza mesajina hicbir sey eklenmez (geriye donuk uyumlu).
 

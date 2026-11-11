@@ -111,7 +111,7 @@ class Kolai_Review_Routes extends Kolai_Route_Base {
      */
     public function get_product_reviews($request) {
         return $this->handle(function () use ($request) {
-            $product_id = (int) $request->get_param('product_id');
+            $product_id = (int) $this->get_path_param($request, 'product_id');
 
             $page         = $request->get_param('page') !== null ? (int) $request->get_param('page') : 1;
             $per_page_raw = $request->get_param('per_page');
@@ -154,7 +154,7 @@ class Kolai_Review_Routes extends Kolai_Route_Base {
      */
     public function get_review($request) {
         return $this->handle(function () use ($request) {
-            $review_id = (int) $request->get_param('id');
+            $review_id = (int) $this->get_path_param($request, 'id');
             $data = $this->review_service->get_review_by_id($review_id);
             return Kolai_Review_Mapper::map_to_response($data);
         }, $request);

@@ -165,7 +165,7 @@ class Kolai_Product_Routes extends Kolai_Route_Base {
      */
     public function get_product($request) {
         return $this->handle(function() use ($request) {
-            $product_id = intval($request->get_param('id'));
+            $product_id = intval($this->get_path_param($request, 'id'));
 
             if (!$product_id) {
                 throw new Kolai_Bad_Request_Exception('Invalid product ID', Kolai_Constants::ERROR_INVALID_PRODUCT_ID);
@@ -186,7 +186,7 @@ class Kolai_Product_Routes extends Kolai_Route_Base {
      */
     public function get_product_with_variants($request) {
         return $this->handle(function() use ($request) {
-            $product_id = intval($request->get_param('id'));
+            $product_id = intval($this->get_path_param($request, 'id'));
 
             if (!$product_id) {
                 throw new Kolai_Bad_Request_Exception('Invalid product ID', Kolai_Constants::ERROR_INVALID_PRODUCT_ID);

@@ -104,6 +104,7 @@ class Kolai_Core {
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-loader.php';
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-logger.php';
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-meta-keys.php';
+        require_once KOLAI_INCLUDES_DIR . 'class-kolai-lock.php';
         require_once KOLAI_INCLUDES_DIR . 'class-kolai-api.php';
         require_once KOLAI_INCLUDES_DIR . 'payment/class-kolai-iyzico-client.php';
         require_once KOLAI_INCLUDES_DIR . 'payment/class-kolai-refund-service.php';

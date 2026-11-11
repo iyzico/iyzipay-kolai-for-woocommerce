@@ -51,6 +51,10 @@ WP Admin → **Kolai → Ayarlar → iyzico Iade / Iptal Ayarlari**:
 - **Sinirlama:** iyzico iptali basarisiz olsa bile WooCommerce durum degisikligi engellenmez; hata
   log'a ve siparis notuna yazilir. Anahtarlar ayarli degilse islem zarifce atlanir (not + log).
 
+## Zaman Asimi
+
+iyzico'ya yapilan iade ve iptal istekleri baglanti icin **10 sn**, toplamda **30 sn** zaman asimi ile gonderilir. Zaman asimina ugrayan istek basarisiz sayilir ve `payment` context'ine `iyzico HTTP request failed` (`timed_out: true`) olarak loglanir. Zaman asiminda iyzico islemi yine de tamamlamis olabilir; tekrar denemeden once iyzico panelinden islemin durumunu kontrol edin.
+
 ## Loglama
 
 Tum iade/iptal adimlari `payment` context'i altinda loglanir (bkz. [LOGS.md](LOGS.md)).

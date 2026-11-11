@@ -68,7 +68,10 @@ class Kolai_Iyzico_Client {
         ));
 
         try {
-            $result = \Iyzipay\Model\Refund::create($request, $this->build_options());
+            $options = $this->build_options();
+            $result  = $this->with_timeouts(static function () use ($request, $options) {
+                return \Iyzipay\Model\Refund::create($request, $options);
+            });
         } catch (\Throwable $e) {
             Kolai_Logger::error('payment', 'iyzico refund threw exception', array(
                 'paymentTransactionId' => $payment_transaction_id,
@@ -112,7 +115,10 @@ class Kolai_Iyzico_Client {
         ));
 
         try {
-            $result = \Iyzipay\Model\Cancel::create($request, $this->build_options());
+            $options = $this->build_options();
+            $result  = $this->with_timeouts(static function () use ($request, $options) {
+                return \Iyzipay\Model\Cancel::create($request, $options);
+            });
         } catch (\Throwable $e) {
             Kolai_Logger::error('payment', 'iyzico cancel threw exception', array(
                 'paymentId' => $payment_id,
@@ -173,6 +179,52 @@ class Kolai_Iyzico_Client {
         $options->setSecretKey($this->get_secret_key());
         $options->setBaseUrl($this->get_base_url());
         return $options;
+    }
+
+    /**
+     * Run an SDK call with the timeout-enforcing curl transport.
+     *
+     * The SDK keeps its HTTP client in a private static on ApiResource with no
+     * setter, and another plugin may share the same SDK classes in this request.
+     * The client is therefore swapped in only for the duration of our call and
+     * the previous one is restored afterwards.
+     *
+     * @param callable $call
+     * @return mixed
+     */
+    private function with_timeouts($call) {
+        $property = null;
+        $previous = null;
+
+        try {
+            if (!class_exists('\Iyzipay\Curl') || !class_exists('\Iyzipay\DefaultHttpClient')) {
+                throw new \RuntimeException('iyzipay-php transport classes not found');
+            }
+            if (!class_exists('Kolai_Iyzico_Curl')) {
+                require_once KOLAI_INCLUDES_DIR . 'payment/class-kolai-iyzico-curl.php';
+            }
+            $property = new \ReflectionProperty('\Iyzipay\ApiResource', 'httpClient');
+            if (PHP_VERSION_ID < 80100) {
+                // Required before PHP 8.1, a deprecated no-op afterwards.
+                $property->setAccessible(true);
+            }
+            $previous = $property->getValue();
+            $property->setValue(null, \Iyzipay\DefaultHttpClient::create(new Kolai_Iyzico_Curl()));
+        } catch (\Throwable $e) {
+            // A different SDK build without this property: fall back to its own transport.
+            Kolai_Logger::warning('payment', 'iyzico timeouts could not be applied', array(
+                'error' => $e->getMessage(),
+            ));
+            $property = null;
+        }
+
+        try {
+            return $call();
+        } finally {
+            if ($property !== null) {
+                $property->setValue(null, $previous);
+            }
+        }
     }
 
     /**
