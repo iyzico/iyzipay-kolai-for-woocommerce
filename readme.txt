@@ -4,7 +4,7 @@ Tags: woocommerce, iyzico, refund, rest-api, payment
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.8.9
+Stable tag: 1.8.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -75,6 +75,12 @@ iyzico is a third-party service. Its use is subject to iyzico's terms and privac
 * Privacy policy: https://www.iyzico.com/en/privacy-policy
 
 == Changelog ==
+
+= 1.8.10 =
+* Security: resource ids (`orderId`, product and review `id`) are now read only from the URL path. The query string is not covered by the request signature, so a parameter such as `?orderId=456` appended to a request signed for `/orders/123` could previously redirect it to another order.
+* Security: `PATCH /orders/{orderId}` now only updates orders created through Kolai (payment method `kolai-app`). Other store orders return `404` / `1002`, so a signed request can no longer mark a regular order as paid.
+* Concurrency: updates to the same order are serialized with a per-order lock, so two simultaneous `PATCH` requests can no longer reduce stock or fire `woocommerce_payment_complete` twice. A request that waits more than 10 seconds returns `503` / `1003` and can be retried.
+* iyzico refund and cancel calls now use a 10 second connect and 30 second total timeout instead of waiting until PHP's execution limit. Timeouts are logged under the `payment` context.
 
 = 1.8.9 =
 * Optional MERSIS number: the seller MERSIS number on **WP Admin → Kolai → Sözleşmeler** is now optional. When it is left empty, the `MERSIS No:` line (with its surrounding `<br>`) is removed from the distance sales contract and preliminary information form returned by the contracts API, instead of an empty label. If the placeholder is used inside running text, only the placeholder is removed. When a MERSIS number is set, output is unchanged.
@@ -150,6 +156,9 @@ Security & reliability hardening pass (post-review remediation).
 * Previous stable release.
 
 == Upgrade Notice ==
+
+= 1.8.10 =
+Security fixes: resource ids are read only from the signed URL path, and order status updates are limited to Kolai orders and serialized per order. iyzico calls now time out after 30 seconds.
 
 = 1.8.9 =
 The seller MERSIS number is now optional; when empty, its line is removed from the contracts. No API field changes.
